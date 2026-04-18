@@ -1,0 +1,16 @@
+{
+  "name": "better-dispute",
+  "version": "1.0.0",
+  "description": "A structured debate app using GitHub Issues as append-only storage.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --experimental-vm-modules tests/run-all.js",
+    "test:coverage": "npx c8 --reporter=text --reporter=lcov node --experimental-vm-modules tests/run-all.js",
+    "test:check": "npx c8 check-coverage --lines 85 --functions 85 --branches 80 node --experimental-vm-modules tests/run-all.js",
+    "serve": "npx serve . -p 3000"
+  },
+  "devDependencies": {
+    "c8": "^10.1.2"
+  }
+}

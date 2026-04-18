@@ -1,50 +1,112 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version change: (new) → 1.0.0
+Added sections:
+  - Core Principles (I–IV)
+  - Quality Gates
+  - Development Workflow
+  - Governance
+Modified principles: N/A (initial ratification)
+Removed sections: N/A
+
+Templates reviewed:
+  - .specify/templates/constitution-template.md ✅ (source)
+  - .specify/templates/plan-template.md ✅ (no constitution-specific overrides required)
+  - .specify/templates/spec-template.md ✅ (no changes required)
+  - .specify/templates/tasks-template.md ✅ (no changes required)
+
+Follow-up TODOs:
+  - None. All placeholders resolved.
+-->
+
+# BetterDispute Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality (NON-NEGOTIABLE)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All production code MUST meet the following standards before merging:
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- Every module, function, and class MUST have a single, clearly defined responsibility (Single Responsibility Principle).
+- Code MUST be reviewed by at least one peer before merge; self-merges are prohibited on protected branches.
+- All public APIs MUST be documented with purpose, parameters, return values, and error conditions.
+- Dead code, commented-out blocks, and unused imports MUST be removed prior to merge.
+- Linting and static analysis MUST pass with zero errors; warnings MUST be reviewed and either resolved or explicitly suppressed with justification.
+- Duplication MUST be eliminated through abstraction before a feature is considered complete; copy-paste of non-trivial logic is a blocking defect.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: Consistent, clean code reduces onboarding friction, lowers defect rates, and makes the system maintainable as the team and codebase grow.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Testing Standards (NON-NEGOTIABLE)
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Automated testing is a first-class deliverable, not an afterthought:
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Every new feature or bug fix MUST be accompanied by tests written before or alongside the implementation (TDD encouraged; coverage gate enforced).
+- Unit test coverage MUST not drop below **80%** for any module; the project-wide coverage gate is **85%**.
+- Integration tests MUST cover all cross-module contracts, external API interactions, and database operations.
+- Tests MUST be deterministic — flaky tests MUST be fixed or quarantined within one sprint of discovery.
+- Test data MUST be isolated; tests MUST NOT share mutable global state or depend on execution order.
+- End-to-end tests MUST cover all critical user journeys defined in the specification.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale**: Comprehensive, reliable tests are the primary mechanism for safe iteration and confident deployment.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. User Experience Consistency (NON-NEGOTIABLE)
+
+All user-facing surfaces MUST present a coherent, predictable experience:
+
+- UI components MUST be sourced from the project's approved design system; custom one-off components require explicit design review.
+- Error messages MUST be human-readable, actionable, and consistent in tone across the entire application.
+- Navigation patterns, loading states, and feedback mechanisms (toasts, modals, inline errors) MUST follow documented UX conventions.
+- Accessibility (WCAG 2.1 AA) MUST be validated for all new UI surfaces before release.
+- User-facing copy (labels, placeholders, help text) MUST be reviewed for clarity and tone consistency before merge.
+- Breaking changes to existing UX flows MUST be flagged in the PR description and reviewed by a product stakeholder.
+
+**Rationale**: Inconsistent UX erodes user trust and increases support burden. Predictability and accessibility are non-negotiable qualities for a dispute-resolution product.
+
+### IV. Performance Requirements
+
+Performance is a feature and MUST be validated continuously:
+
+- API endpoints MUST respond within **200 ms** at the 95th percentile under expected load; any endpoint exceeding **500 ms** p95 is a blocking defect.
+- Front-end pages MUST achieve a Largest Contentful Paint (LCP) ≤ **2.5 s** and a Cumulative Layout Shift (CLS) ≤ **0.1** on a simulated mid-range device.
+- Database queries MUST use appropriate indexes; queries without index coverage on tables > 10 k rows MUST be reviewed before merge.
+- Background jobs MUST define explicit timeout and retry policies; unbounded tasks are prohibited.
+- Performance benchmarks MUST be run in CI on every PR touching data-access or rendering-critical paths; regressions of > 10% MUST be resolved or justified before merge.
+
+**Rationale**: A dispute-resolution platform handles time-sensitive interactions. Slow or unpredictable performance degrades user trust and can affect legal or contractual outcomes.
+
+## Quality Gates
+
+The following gates MUST pass before any code may be merged to the main branch:
+
+- All automated tests pass (unit, integration, and applicable E2E).
+- Code coverage thresholds met (module ≥ 80%, project ≥ 85%).
+- Linter and static-analysis checks pass with zero errors.
+- Performance benchmarks within accepted thresholds (no > 10% regression).
+- Accessibility audit passes for changed UI surfaces.
+- Peer code review approval obtained.
+- No unresolved HIGH or CRITICAL security findings from SAST/dependency scanning.
+
+## Development Workflow
+
+- Feature branches MUST be named `feature/<short-description>` and opened against the main integration branch.
+- Commits MUST follow Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`, etc.).
+- PRs MUST reference the related issue/task and include a summary of changes, testing approach, and performance impact if applicable.
+- Hotfixes bypass feature branching but MUST still satisfy all quality gates and receive expedited peer review within 24 hours of merge.
+- Releases follow Semantic Versioning: MAJOR for breaking changes, MINOR for new features, PATCH for fixes and non-breaking improvements.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development guidelines and practices within the BetterDispute project. Where conflicts arise, this document takes precedence.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment procedure**:
+1. Propose a change via a PR that modifies this file with a clear rationale.
+2. At least two maintainers MUST approve the PR.
+3. A migration plan MUST be provided for any principle removal or redefinition (MAJOR version bump).
+4. `LAST_AMENDED_DATE` and `CONSTITUTION_VERSION` MUST be updated in the same commit.
+
+**Versioning policy**: Semantic versioning applies to this document per the rules described in the constitution agent instructions.
+
+**Compliance review**: Adherence to this constitution MUST be verified during each sprint retrospective and whenever a new team member joins.
+
+**Version**: 1.0.0 | **Ratified**: 2026-04-18 | **Last Amended**: 2026-04-18
