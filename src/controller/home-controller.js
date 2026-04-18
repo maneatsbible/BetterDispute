@@ -31,7 +31,7 @@ export class HomeController {
 
   /**
    * Load a page of Assertions from the data repo.
-   * Returns only Issues whose BD:META type is "assertion" (excludes offers).
+   * Returns only Issues whose DSP:META type is "assertion" (excludes offers).
    *
    * @param {number} [page=1]
    * @returns {Promise<Assertion[]>}
@@ -39,7 +39,7 @@ export class HomeController {
   async loadFeed(page = 1) {
     const url =
       `${gh.issuesUrl(this._dataRepo)}` +
-      `?labels=bd%3Aassertion&state=open&per_page=${PER_PAGE}&page=${page}` +
+      `?labels=dsp%3Aassertion&state=open&per_page=${PER_PAGE}&page=${page}` +
       `&sort=created&direction=desc`;
 
     const issues = await gh.get(url, this._token);
@@ -103,11 +103,11 @@ export class HomeController {
       throw new Error('Permission denied.');
     }
 
-    // Build BD:META
+    // Build DSP:META
     const meta = {
       type:               POST_TYPE_ASSERTION,
       version:            1,
-      appId:              'better-dispute',
+      appId:              gh.APP_ID,
       parentId:           null,
       rootId:             null,   // will be self-referential — updated after creation
       isOffer:            false,
@@ -124,7 +124,7 @@ export class HomeController {
     const created = await gh.post(gh.issuesUrl(this._dataRepo), {
       title,
       body:   gh.buildBody(meta, content),
-      labels: ['bd:assertion'],
+      labels: ['dsp:assertion'],
     }, this._token);
 
     // Patch rootId to self-reference once we have the issue number.
@@ -187,7 +187,7 @@ export class HomeController {
     const challengeMeta = {
       type:          'challenge',
       version:       1,
-      appId:         'better-dispute',
+      appId:         gh.APP_ID,
       parentId:      post.id,
       rootId:        post.meta?.rootId ?? post.id,
       disputeId:     null,   // backfilled after dispute creation
@@ -197,13 +197,13 @@ export class HomeController {
     const challenge = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Challenge to #${post.id}: ${text.slice(0, 60)}`,
       body:   gh.buildBody(challengeMeta, text),
-      labels: ['bd:challenge'],
+      labels: ['dsp:challenge'],
     }, this._token);
 
     const disputeMeta = {
       type:               'dispute',
       version:            1,
-      appId:              'better-dispute',
+      appId:              gh.APP_ID,
       challengerId:       person.id,
       defenderId:         post.authorId,
       rootPostId:         post.meta?.rootId ?? post.id,
@@ -216,7 +216,7 @@ export class HomeController {
     const dispute = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  disputeTitle,
       body:   gh.buildBody(disputeMeta, disputeTitle),
-      labels: ['bd:dispute', 'bd:active'],
+      labels: ['dsp:dispute', 'dsp:active'],
     }, this._token);
 
     // Backfill disputeId into the Challenge.
@@ -275,7 +275,7 @@ export class HomeController {
     const meta = {
       type:        'agreement',
       version:     1,
-      appId:       'better-dispute',
+      appId:       gh.APP_ID,
       assertionId: assertion.id,
       personId:    person.id,
     };
@@ -284,7 +284,7 @@ export class HomeController {
     const created = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Agreement: @${person.login} agrees with #${assertion.id}`,
       body:   gh.buildBody(meta, body),
-      labels: ['bd:agreement'],
+      labels: ['dsp:agreement'],
     }, this._token);
 
     cache.invalidatePattern(gh.issueUrl(this._dataRepo, assertion.id));

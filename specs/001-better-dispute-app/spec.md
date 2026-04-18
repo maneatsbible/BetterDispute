@@ -1,9 +1,9 @@
-# Feature Specification: Better Dispute App
+# Feature Specification: disputable.io
 
 **Feature Branch**: `001-better-dispute-app`
 **Created**: 2026-04-18
 **Status**: Draft
-**Input**: User description: "I want to build an app called Better Dispute — plain vanilla JavaScript, runs in browser, GitHub back-end for users/repos/issues. No external frameworks or libraries."
+**Input**: User description: "I want to build an app called disputable.io — plain vanilla JavaScript, runs in browser, GitHub back-end for users/repos/issues. No external frameworks or libraries."
 
 ---
 
@@ -12,7 +12,7 @@
 ### Session 2026-04-18
 
 - Q: How should GitHub authentication be handled on a static site with no server? → A: GitHub Device Flow for v1 (zero-server); serverless token-exchange function planned for v2.
-- Q: Where do GitHub Issues (Posts/Disputes) live — single shared repo, per-topic, or per-user? → A: Single shared repo owned by the app (e.g., `betterdispute/data`); all users' content is stored as issues there.
+- Q: Where do GitHub Issues (Posts/Disputes) live — single shared repo, per-topic, or per-user? → A: Single shared repo owned by the app (e.g., `disputableio/disputable-data`); all users' content is stored as issues there.
 - Q: When multiple people have agreed with an Assertion and it is challenged, how many Disputes are created? → A: One Dispute per challenger–defender pair; each agre-er who chooses to respond opens their own separate 1v1 Dispute.
 - Q: How is the Crickets countdown enforced with no server? → A: Agreed deadline timestamp stored in the GitHub Issue body; clients compute remaining time on load; the first client to load past the deadline writes the Crickets event as a new GitHub Issue.
 - Q: What is the caching and pre-fetching strategy given GitHub API rate limits? → A: localStorage cache with ETag-based conditional GETs (If-None-Match); viewport pre-fetch for visible Home feed cards.
@@ -23,7 +23,7 @@
 
 ### User Story 1 — View and Start Assertions (Priority: P1)
 
-A visitor opens Better Dispute in their browser. They see the Home view listing top-level Assertions as summary cards. They can authenticate via GitHub and compose a new Assertion (text and/or a single image). They can also post as the special @strawman persona to plant a position for others to dispute.
+A visitor opens disputable.io in their browser. They see the Home view listing top-level Assertions as summary cards. They can authenticate via GitHub and compose a new Assertion (text and/or a single image). They can also post as the special @strawman persona to plant a position for others to dispute.
 
 **Why this priority**: The assertion feed and composition are the entry point for all activity. Without this, no disputes can begin.
 
@@ -135,6 +135,21 @@ Users receive notifications when challenged or when their answer is challenged. 
 
 ---
 
+## Platform Philosophy
+
+### On Argumentation Style
+
+disputable.io is built on the conviction that **the best disputes are won with evidence and truth, not with rhetorical technique**. The platform therefore explicitly discourages philosophical argumentation — the construction of formal syllogisms, premise-mapping, and validity-based "winning" — as a primary mode of engagement. Such approaches reward structural cleverness over substantive engagement and can be used to avoid rather than address what is actually true.
+
+This philosophy is expressed in the product in two ways:
+
+1. **Post types** (Assertion, Challenge, Answer) are designed around substantive claims, questions, and responses — not logical scaffolding.
+2. **Logic & Reasoning widgets** (Fallacy Tag, Claim Map) are available *only as post-hoc diagnostic tools* — they describe errors and patterns in reasoning that has already occurred, never as a method to construct or win an argument. They are restricted to Challenge and Answer posts (not Assertions) and to Moment annotations.
+
+> A Fallacy Tag names a failure that happened. A Claim Map renders visible what was implicit. Neither is an argument.
+
+---
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
@@ -198,7 +213,7 @@ Users receive notifications when challenged or when their answer is challenged. 
 **UI / UX**
 
 - **FR-033**: The app MUST use a dark theme with select colorful accent elements.
-- **FR-034**: The header MUST contain: home/scales icon (top-left), "Better Dispute" name, and the current version (far right).
+- **FR-034**: The header MUST contain: home/scales icon (top-left), `disputable.io`, and the current version (far right).
 - **FR-035**: Post type icons MUST be: Assertion = `!`, Challenge = `?`, Answer = `✓`.
 - **FR-036**: Home View MUST list top-level Assertion/Dispute summary cards; cards MUST show a "Your turn" badge when applicable.
 - **FR-037**: Cards with no challenges MUST be visually indicated as terminal (dimmed or non-interactive styling) without a text label.

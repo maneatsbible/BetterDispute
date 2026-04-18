@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach } from '../runner.js';
 import {
-  get, post, patch, buildBody, parseBody, issueUrl, issuesUrl, ApiError,
+  get, post, patch, buildBody, parseBody, issueUrl, issuesUrl, ApiError, APP_ID,
 } from '../../src/api/github-client.js';
 
 // ---------------------------------------------------------------------------
@@ -41,7 +41,7 @@ function mockFetch(responses) {
 
 describe('buildBody / parseBody', () => {
   it('round-trips meta + content', () => {
-    const meta    = { type: 'assertion', version: 1, appId: 'better-dispute' };
+    const meta    = { type: 'assertion', version: 1, appId: APP_ID };
     const content = 'Hello world';
     const body    = buildBody(meta, content);
     const parsed  = parseBody(body);
@@ -51,22 +51,27 @@ describe('buildBody / parseBody', () => {
     expect(body).toContain('Hello world');
   });
 
-  it('returns null for body without BD:META', () => {
+  it('returns null for body without DSP:META', () => {
     expect(parseBody('No meta here')).toBeNull();
     expect(parseBody(null)).toBeNull();
     expect(parseBody('')).toBeNull();
   });
 
-  it('returns null for body with invalid JSON in BD:META', () => {
-    const bad = '<!-- BD:META\n{broken json\n-->';
+  it('returns null for body with invalid JSON in DSP:META', () => {
+    const bad = '<!-- DSP:META\n{broken json\n-->';
     expect(parseBody(bad)).toBeNull();
   });
 
   it('buildBody with no content produces only the meta block', () => {
-    const meta = { type: 'dispute', version: 1, appId: 'better-dispute' };
+    const meta = { type: 'dispute', version: 1, appId: APP_ID };
     const body = buildBody(meta);
-    expect(body).toContain('BD:META');
+    expect(body).toContain('DSP:META');
     expect(parseBody(body).type).toBe('dispute');
+  });
+
+  it('returns null when appId does not match the current app', () => {
+    const badAppId = '<!-- DSP:META\n{"type":"assertion","version":1,"appId":"other-app"}\n-->';
+    expect(parseBody(badAppId)).toBeNull();
   });
 });
 

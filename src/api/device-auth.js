@@ -11,9 +11,9 @@
 const DEVICE_CODE_URL  = 'https://github.com/login/device/code';
 const TOKEN_URL        = 'https://github.com/login/oauth/access_token';
 
-const SESSION_TOKEN_KEY = 'bd:auth:token';
-const LOCAL_LOGIN_KEY   = 'bd:auth:login';
-const LOCAL_USERID_KEY  = 'bd:auth:userId';
+const SESSION_TOKEN_KEY = 'dsp:auth:token';
+const LOCAL_LOGIN_KEY   = 'dsp:auth:login';
+const LOCAL_USERID_KEY  = 'dsp:auth:userId';
 
 export class AuthError extends Error {
   constructor(message, code = null) {
@@ -165,7 +165,7 @@ export function clearToken() {
  * Caches login+id in localStorage.
  *
  * @param {string} token
- * @returns {Promise<{ login: string, id: number, avatarUrl: string }>}
+ * @returns {Promise<{ login: string, id: number, profilePicUrl: string }>}
  */
 export async function getAuthenticatedUser(token) {
   const res = await fetch('https://api.github.com/user', {
@@ -183,7 +183,7 @@ export async function getAuthenticatedUser(token) {
   const data        = await res.json();
   const login       = data.login;
   const id          = data.id;
-  const avatarUrl   = data.avatar_url;
+  const profilePicUrl = data.avatar_url;
 
   try {
     localStorage.setItem(LOCAL_LOGIN_KEY,  login);
@@ -192,7 +192,7 @@ export async function getAuthenticatedUser(token) {
     // ignore
   }
 
-  return { login, id, avatarUrl };
+  return { login, id, profilePicUrl };
 }
 
 /**

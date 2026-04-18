@@ -33,5 +33,5 @@ async function* findTests(dir) {
     await import(file);
   }
 
-  summary();
+  await summary();
 })();

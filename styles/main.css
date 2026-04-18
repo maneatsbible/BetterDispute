@@ -1,6 +1,9 @@
-/* Better Dispute — Design System */
+/* disputable.io design system */
 
 :root {
+  /* Brand */
+  --app-tagline:       'every claim is disputable.';
+
   /* Backgrounds */
   --color-bg:           #0d1117;
   --color-surface:      #161b22;
@@ -12,12 +15,13 @@
   --color-text-muted:   #8b949e;
 
   /* Accents */
+  --color-accent:       #e85d04;
   --color-accent-blue:  #58a6ff;
   --color-accent-green: #3fb950;
   --color-accent-yellow:#d29922;
   --color-accent-red:   #f85149;
   --color-accent-purple:#bc8cff;
-  --color-accent-orange:#ff7b72;
+  --color-accent-orange:#e85d04;
 
   /* State */
   --color-disabled:     #484f58;

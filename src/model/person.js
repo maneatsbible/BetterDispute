@@ -1,7 +1,7 @@
 /**
  * Model: Person
  *
- * Represents a GitHub user participating in Better Dispute.
+ * Represents a GitHub user participating in disputable.io.
  * The special "@strawman" user is the site owner who can have
  * assertions and challenges posted on their behalf.
  */
@@ -12,12 +12,12 @@ export class Person {
   /**
    * @param {number} id        GitHub user id
    * @param {string} login     GitHub login (no @)
-   * @param {string} avatarUrl GitHub avatar URL
+   * @param {string} profilePicUrl GitHub profile pic URL
    */
-  constructor(id, login, avatarUrl = '') {
+  constructor(id, login, profilePicUrl = '') {
     this.id        = id;
     this.login     = login;
-    this.avatarUrl = avatarUrl;
+    this.profilePicUrl = profilePicUrl;
   }
 
   /** True when this person is the configured strawman account. */
@@ -34,7 +34,7 @@ export class Person {
     return new Person(
       ghUser.id,
       ghUser.login,
-      ghUser.avatar_url ?? ''
+      ghUser.avatar_url ?? ''  // stored as profilePicUrl
     );
   }
 }

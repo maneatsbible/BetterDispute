@@ -6,6 +6,7 @@
 import * as cache from './cache.js';
 
 const BASE_URL = 'https://api.github.com';
+export const APP_ID = 'disputable.io';
 
 export class ApiError extends Error {
   /**
@@ -101,13 +102,13 @@ export async function patch(url, body, token = null) {
 // Body helpers
 // ---------------------------------------------------------------------------
 
-const META_OPEN  = '<!-- BD:META';
+const META_OPEN  = '<!-- DSP:META';
 const META_CLOSE = '-->';
 
 /**
- * Build a GitHub Issue body from BD:META + optional human-readable content.
+ * Build a GitHub Issue body from DSP:META + optional human-readable content.
  *
- * @param {object} meta    BD:META JSON object
+ * @param {object} meta    DSP:META JSON object
  * @param {string} content Human-readable text (may be empty string)
  * @returns {string}
  */
@@ -117,10 +118,10 @@ export function buildBody(meta, content = '') {
 }
 
 /**
- * Extract and parse the BD:META JSON block from an issue body.
+ * Extract and parse the DSP:META JSON block from an issue body.
  *
  * @param {string} issueBody GitHub issue body string
- * @returns {object|null}    Parsed BD:META object, or null if absent/invalid
+ * @returns {object|null}    Parsed DSP:META object, or null if absent/invalid
  */
 export function parseBody(issueBody) {
   if (!issueBody) return null;
@@ -131,7 +132,10 @@ export function parseBody(issueBody) {
   if (end === -1) return null;
   const jsonStr = issueBody.slice(innerStart, end).trim();
   try {
-    return JSON.parse(jsonStr);
+    const meta = JSON.parse(jsonStr);
+    if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+    if (meta.appId !== APP_ID) return null;
+    return meta;
   } catch {
     return null;
   }

@@ -1,5 +1,5 @@
 /**
- * Icon constants for Better Dispute.
+ * Icon constants for disputable.io.
  * Using Unicode characters to stay framework-free.
  */
 

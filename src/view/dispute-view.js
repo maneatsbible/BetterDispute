@@ -89,7 +89,7 @@ export class DisputeView {
     backBtn.innerHTML = `${ICON_BACK} Back`;
     backBtn.addEventListener('click', () => {
       setUrlParams({});
-      this._root.dispatchEvent(new CustomEvent('bd:navigate', {
+      this._root.dispatchEvent(new CustomEvent('dsp:navigate', {
         bubbles: true, detail: { view: 'home' },
       }));
     });

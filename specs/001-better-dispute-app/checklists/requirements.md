@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Better Dispute App
+# Specification Quality Checklist: disputable.io
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-04-18

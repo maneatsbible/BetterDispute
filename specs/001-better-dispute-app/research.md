@@ -1,4 +1,4 @@
-# Research: Better Dispute App
+# Research: disputable.io
 
 **Phase**: 0 — Unknowns resolved before design  
 **Date**: 2026-04-18  
@@ -35,7 +35,7 @@
 
 **Encoding approach**:
 ```
-<!-- BD:META
+<!-- DSP:META
 {
   "type": "assertion|challenge|answer|dispute|agreement|crickets|offer",
   "version": 1,
@@ -51,12 +51,12 @@ Human-readable content here (text and/or image markdown).
 ```
 
 **Labels used** (must be pre-created in the shared repo):
-- `bd:assertion`, `bd:challenge`, `bd:answer`, `bd:dispute`, `bd:agreement`, `bd:crickets`, `bd:offer`
-- `bd:resolved`, `bd:active`, `bd:crickets-event`
+- `dsp:assertion`, `dsp:challenge`, `dsp:answer`, `dsp:dispute`, `dsp:agreement`, `dsp:crickets`, `dsp:offer`
+- `dsp:resolved`, `dsp:active`, `dsp:crickets-event`
 
 **Querying**:
-- List all top-level assertions: `GET /repos/{owner}/{repo}/issues?labels=bd:assertion&state=open`
-- List all issues in a dispute: `GET /repos/{owner}/{repo}/issues?labels=bd:dispute:{id}` (dynamic label per dispute)
+- List all top-level assertions: `GET /repos/{owner}/{repo}/issues?labels=dsp:assertion&state=open`
+- List all issues in a dispute: `GET /repos/{owner}/{repo}/issues?labels=dsp:dispute:{id}` (dynamic label per dispute)
 - The `parentId` field in the meta block encodes the tree structure (parent Issue number).
 
 **Rationale**: JSON comment block is invisible in GitHub's rendered Issue view but trivially parseable in JS. Labels enable efficient server-side filtering. No Issue edits — only new Issues — preserves the append-only model and the full audit log.
@@ -135,7 +135,7 @@ export class DisputeController {
 **Protocol**:
 1. When CricketsConditions are agreed, a new Issue is written with `type: "crickets-conditions"` containing `{ deadline: ISO8601, challengeId, disputeId }`.
 2. Every client loading the Dispute View checks: `if (Date.now() > deadline && !cricketsEventExists)`.
-3. The first client to detect expiry attempts to write a `type: "crickets-event"` Issue. GitHub's issue creation is not atomic, but race conditions produce at most one extra duplicate Issue; the UI de-dupes by treating the earliest `created_at` among `bd:crickets-event` Issues in the dispute as the canonical event.
+3. The first client to detect expiry attempts to write a `type: "crickets-event"` Issue. GitHub's issue creation is not atomic, but race conditions produce at most one extra duplicate Issue; the UI de-dupes by treating the earliest `created_at` among `dsp:crickets-event` Issues in the dispute as the canonical event.
 4. The Crickets event UI (visual + audio) is shown to both parties.
 
 **Audio**: Web Audio API oscillator chain simulating a cricket chirp (alternating 4-5 kHz tones in a rapid pattern). No audio files needed.

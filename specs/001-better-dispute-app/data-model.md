@@ -1,4 +1,4 @@
-# Data Model: Better Dispute App
+# Data Model: disputable.io
 
 **Phase**: 1 — Design  
 **Date**: 2026-04-18  
@@ -16,7 +16,7 @@ Represents an authenticated GitHub user.
 |-------|------|--------|-------|
 | `id` | `number` | GitHub user id | Globally unique, immutable |
 | `name` | `string` | GitHub login prefixed `@` | e.g., `@alice` |
-| `avatarUrl` | `string` | GitHub `avatar_url` | Display only |
+| `profilePicUrl` | `string` | GitHub `avatar_url` | Display only |
 | `isStrawman` | `boolean` | Derived | `true` if `name === '@strawman'` |
 
 **Special instance**: `@strawman` — a pre-configured GitHub account. Any authenticated Person can post an Assertion as @strawman by using the @strawman token (stored as a repo secret / env var in the static site build). A Person who posts as @strawman is recorded in the metadata as `proxyAuthor`.
@@ -35,15 +35,15 @@ The base of all user-created content. Every Post is a GitHub Issue in the shared
 | Field | Type | Source | Notes |
 |-------|------|--------|-------|
 | `id` | `number` | GitHub issue number | Globally unique within the repo |
-| `type` | `enum` | `BD:META.type` | `"assertion"`, `"challenge"`, `"answer"` |
+| `type` | `enum` | `DSP:META.type` | `"assertion"`, `"challenge"`, `"answer"` |
 | `authorId` | `number` | GitHub issue `user.id` | Person who created the Issue |
-| `proxyAuthor` | `string \| null` | `BD:META.proxyAuthor` | Set when posting as @strawman |
-| `parentId` | `number \| null` | `BD:META.parentId` | Parent Post id; `null` for root Assertions |
-| `rootId` | `number` | `BD:META.rootId` | Id of the root Assertion in this tree |
+| `proxyAuthor` | `string \| null` | `DSP:META.proxyAuthor` | Set when posting as @strawman |
+| `parentId` | `number \| null` | `DSP:META.parentId` | Parent Post id; `null` for root Assertions |
+| `rootId` | `number` | `DSP:META.rootId` | Id of the root Assertion in this tree |
 | `text` | `string \| null` | Issue body (after meta comment) | Optional for non-root posts |
-| `imageUrl` | `string \| null` | `BD:META.imageUrl` | GitHub issue attachment URL |
+| `imageUrl` | `string \| null` | `DSP:META.imageUrl` | GitHub issue attachment URL |
 | `createdAt` | `ISO8601` | GitHub `created_at` | |
-| `disputeId` | `number \| null` | `BD:META.disputeId` | The Dispute this post belongs to, if any |
+| `disputeId` | `number \| null` | `DSP:META.disputeId` | The Dispute this post belongs to, if any |
 
 **Validation rules**:
 - Top-level Assertions (`parentId === null`): MUST have `text` XOR `imageUrl` (not both, not neither).
@@ -58,7 +58,7 @@ A top-level claim or a resolution Offer. The root of every Post tree.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `isOffer` | `boolean` | `BD:META.isOffer` — `true` when submitted as a resolution Offer within a Dispute |
+| `isOffer` | `boolean` | `DSP:META.isOffer` — `true` when submitted as a resolution Offer within a Dispute |
 | `offeredInDisputeId` | `number \| null` | The Dispute this offer belongs to |
 
 **State transitions** (derived from child entities):
@@ -92,7 +92,7 @@ A response to a Challenge.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `yesNo` | `boolean \| null` | `BD:META.yesNo` — REQUIRED for Interrogatory; `null` for Objection |
+| `yesNo` | `boolean \| null` | `DSP:META.yesNo` — REQUIRED for Interrogatory; `null` for Objection |
 | `counterChallengeId` | `number \| null` | Id of the Challenge Post included in this Answer, if any |
 
 **Constraints**:
@@ -109,16 +109,16 @@ A first-class 1v1 duel between two Persons, triggered by a Challenge.
 | Field | Type | Source | Notes |
 |-------|------|--------|-------|
 | `id` | `number` | GitHub issue number | |
-| `challengerId` | `number` | `BD:META.challengerId` | Person who issued the first Challenge |
-| `defenderId` | `number` | `BD:META.defenderId` | Person who must answer first |
-| `rootPostId` | `number` | `BD:META.rootPostId` | The Post that was challenged to start this Dispute |
-| `triggerChallengeId` | `number` | `BD:META.triggerChallengeId` | The initial Challenge Post |
+| `challengerId` | `number` | `DSP:META.challengerId` | Person who issued the first Challenge |
+| `defenderId` | `number` | `DSP:META.defenderId` | Person who must answer first |
+| `rootPostId` | `number` | `DSP:META.rootPostId` | The Post that was challenged to start this Dispute |
+| `triggerChallengeId` | `number` | `DSP:META.triggerChallengeId` | The initial Challenge Post |
 | `currentTurnPersonId` | `number` | Derived — last action determines turn | |
 | `status` | `enum` | Derived from child Issues | `"active"`, `"resolved"`, `"crickets"` |
 | `cricketsConditions` | `CricketsConditions \| null` | Derived from child Issues | |
 | `createdAt` | `ISO8601` | GitHub `created_at` | |
 
-**Labels on the Dispute Issue**: `bd:dispute`, `bd:active` (or `bd:resolved` / `bd:crickets-event`).
+**Labels on the Dispute Issue**: `dsp:dispute`, `dsp:active` (or `dsp:resolved` / `dsp:crickets-event`).
 
 **Turn derivation rule**: The Person whose last action in the Dispute was answered is "waiting"; the other person is "to move". On Dispute creation, `currentTurnPersonId = defenderId`.
 
@@ -218,14 +218,14 @@ Records that a Crickets deadline expired. Stored as a child GitHub Issue.
 
 | Entity | GitHub Issues label | Key metadata fields |
 |--------|--------------------|---------------------|
-| Assertion | `bd:assertion` | `parentId=null`, `rootId=self` |
-| Challenge | `bd:challenge` | `parentId`, `rootId`, `challengeType`, `disputeId` |
-| Answer | `bd:answer` | `parentId`, `rootId`, `yesNo`, `counterChallengeId`, `disputeId` |
-| Dispute | `bd:dispute` | `challengerId`, `defenderId`, `rootPostId`, `triggerChallengeId` |
-| Agreement | `bd:agreement` | `assertionId`, `personId` |
-| Offer | `bd:offer`, `bd:assertion` | `isOffer=true`, `offeredInDisputeId` |
-| CricketsConditions | `bd:crickets-conditions` | `disputeId`, `durationMs`, `agreedByPersonId` |
-| CricketsEvent | `bd:crickets-event` | `disputeId`, `challengeId` |
+| Assertion | `dsp:assertion` | `parentId=null`, `rootId=self` |
+| Challenge | `dsp:challenge` | `parentId`, `rootId`, `challengeType`, `disputeId` |
+| Answer | `dsp:answer` | `parentId`, `rootId`, `yesNo`, `counterChallengeId`, `disputeId` |
+| Dispute | `dsp:dispute` | `challengerId`, `defenderId`, `rootPostId`, `triggerChallengeId` |
+| Agreement | `dsp:agreement` | `assertionId`, `personId` |
+| Offer | `dsp:offer`, `dsp:assertion` | `isOffer=true`, `offeredInDisputeId` |
+| CricketsConditions | `dsp:crickets-conditions` | `disputeId`, `durationMs`, `agreedByPersonId` |
+| CricketsEvent | `dsp:crickets-event` | `disputeId`, `challengeId` |
 
 ---
 

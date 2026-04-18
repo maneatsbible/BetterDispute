@@ -1,11 +1,11 @@
-# Implementation Plan: Better Dispute App
+# Implementation Plan: disputable.io
 
 **Branch**: `001-better-dispute-app` | **Date**: 2026-04-18 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/001-better-dispute-app/spec.md`
 
 ## Summary
 
-Better Dispute is a browser-only, plain vanilla JavaScript SPA that uses GitHub Issues as an append-only database and GitHub OAuth (Device Flow for v1) for identity. Users compose Assertions, issue Challenges (Interrogatory Y/N or Objection), and engage in structured 1v1 turn-based Disputes. All state lives in a single shared GitHub repository. The architecture is strict MVC: all permission logic in the Controller, dumb rendering in the View, GitHub API entities mapped directly in the Model.
+disputable.io is a browser-only, plain vanilla JavaScript SPA that uses GitHub Issues as an append-only database and GitHub OAuth (Device Flow for v1) for identity. Users compose Assertions, issue Challenges (Interrogatory Y/N or Objection), and engage in structured 1v1 turn-based Disputes. All state lives in a single shared GitHub repository. The architecture is strict MVC: all permission logic in the Controller, dumb rendering in the View, GitHub API entities mapped directly in the Model.
 
 ## Technical Context
 

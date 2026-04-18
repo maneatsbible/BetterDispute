@@ -20,7 +20,7 @@ Follow-up TODOs:
   - None. All placeholders resolved.
 -->
 
-# BetterDispute Constitution
+# disputable.io Constitution
 
 ## Core Principles
 
@@ -97,7 +97,7 @@ The following gates MUST pass before any code may be merged to the main branch:
 
 ## Governance
 
-This constitution supersedes all other development guidelines and practices within the BetterDispute project. Where conflicts arise, this document takes precedence.
+This constitution supersedes all other development guidelines and practices within the disputable.io project. Where conflicts arise, this document takes precedence.
 
 **Amendment procedure**:
 1. Propose a change via a PR that modifies this file with a clear rationale.

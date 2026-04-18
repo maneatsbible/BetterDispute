@@ -55,8 +55,8 @@ describe('cache', () => {
 
   it('invalidatePattern removes all matching entries', () => {
     const base     = 'https://api.github.com/repos/x/y/issues';
-    const url1     = `${base}?labels=bd%3Aassertion`;
-    const url2     = `${base}?labels=bd%3Achallenge`;
+    const url1     = `${base}?labels=dsp%3Aassertion`;
+    const url2     = `${base}?labels=dsp%3Achallenge`;
     const otherUrl = 'https://api.github.com/repos/other/repo/issues';
 
     set(url1,     '"e1"', [{ id: 1 }]);

@@ -1,5 +1,5 @@
 /**
- * Better Dispute — application bootstrap.
+ * disputable.io application bootstrap.
  *
  * Loads CONFIG, restores auth state, reads URL params, and renders
  * the initial view. Registers a popstate listener for browser navigation.
@@ -8,7 +8,7 @@
  * business logic live in the controllers and views imported below.
  */
 
-import CONFIG from './config.js';
+import { CONFIG } from './config.js';
 import { getStoredToken, getCachedUser }  from './api/device-auth.js';
 import { getUrlParams }                   from './utils/url.js';
 import { renderHeader }                   from './view/components/header.js';
@@ -43,8 +43,8 @@ async function bootstrap() {
 }
 
 bootstrap().catch(err => {
-  console.error('[BD] Fatal bootstrap error:', err);
-  const panel = document.getElementById('bd-error');
+  console.error('[disputable.io] Fatal bootstrap error:', err);
+  const panel = document.getElementById('dsp-error');
   if (panel) {
     panel.textContent = `⚠ ${err.message}`;
     panel.style.display = 'block';

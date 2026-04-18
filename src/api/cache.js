@@ -1,10 +1,10 @@
 /**
  * ETag-based localStorage cache for GitHub API responses.
  * Keeps per-URL {etag, data} entries.
- * Keys are prefixed with "bd:cache:" to avoid collisions.
+ * Keys are prefixed with "dsp:cache:" to avoid collisions.
  */
 
-const PREFIX = 'bd:cache:';
+const PREFIX = 'dsp:cache:';
 
 /**
  * Retrieve a cached entry.

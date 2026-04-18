@@ -24,9 +24,9 @@ export class Post {
    * @param {string}      type         POST_TYPE_*
    * @param {string}      authorLogin  GitHub login of the author
    * @param {number}      authorId     GitHub user id
-   * @param {string}      content      Human-readable body (stripped of BD:META)
+   * @param {string}      content      Human-readable body (stripped of DSP:META)
    * @param {string}      createdAt    ISO 8601 string
-   * @param {object}      meta         Parsed BD:META object
+   * @param {object}      meta         Parsed DSP:META object
    */
   constructor(id, type, authorLogin, authorId, content, createdAt, meta) {
     this.id          = id;
@@ -112,7 +112,7 @@ export class Answer extends Post {
 
 const META_CLOSE = '-->';
 
-/** Strip the BD:META comment block and return the remaining text. */
+/** Strip the DSP:META comment block and return the remaining text. */
 function _extractContent(body) {
   if (!body) return '';
   const end = body.indexOf(META_CLOSE);

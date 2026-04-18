@@ -1,7 +1,7 @@
 {
-  "name": "better-dispute",
+  "name": "disputable.io",
   "version": "1.0.0",
-  "description": "A structured debate app using GitHub Issues as append-only storage.",
+  "description": "disputable.io - every claim is disputable.",
   "type": "module",
   "private": true,
   "scripts": {

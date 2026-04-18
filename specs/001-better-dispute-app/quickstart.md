@@ -1,4 +1,4 @@
-# Quickstart: Better Dispute App — Development Setup
+# Quickstart: disputable.io — Development Setup
 
 **Date**: 2026-04-18 | **Plan**: [plan.md](plan.md)
 
@@ -19,7 +19,7 @@
 
 1. Go to **github.com → Settings → Developer settings → OAuth Apps → New OAuth App**.
 2. Fill in:
-   - **Application name**: `Better Dispute (dev)`
+  - **Application name**: `disputable.io (dev)`
    - **Homepage URL**: `http://localhost:8080`
    - **Authorization callback URL**: *(leave blank — Device Flow does not use a callback URL)*
 3. Click **Register application**.
@@ -30,12 +30,12 @@
 
 ## Step 2 — Create the Data Repository
 
-1. Create a new public or private GitHub repository (e.g., `your-org/bd-data`).
-2. Run the label setup script to create the required `bd:*` labels:
+1. Create a new public or private GitHub repository (e.g., `disputableio/disputable-data`).
+2. Run the label setup script to create the required `dsp:*` labels:
 
 ```bash
 # Requires the GitHub CLI (gh) and authentication
-bash scripts/setup-labels.sh your-org/bd-data
+bash scripts/setup-labels.sh disputableio/disputable-data
 ```
 
 Or create labels manually (see the label table in [contracts/github-issues-schema.md](contracts/github-issues-schema.md)).
@@ -56,7 +56,8 @@ Edit `src/config.js`:
 // src/config.js
 export const CONFIG = {
   githubClientId: 'Ov23li...',          // Your OAuth App Client ID
-  dataRepo: 'your-org/bd-data',         // owner/repo of your data repository
+  appName: 'disputable.io',             // product name shown in the UI
+  dataRepo: 'disputableio/disputable-data', // owner/repo of your data repository
   strawmanLogin: 'bd-strawman',         // GitHub username of the @strawman account
   appVersion: '0.1.0',
 };
@@ -168,7 +169,7 @@ All writes go through `src/api/github-client.js`:
 await githubClient.createIssue({
   title: '...',
   body: buildBody(meta, content),   // from src/api/github-client.js helper
-  labels: ['bd:challenge'],
+  labels: ['dsp:challenge'],
 });
 ```
 

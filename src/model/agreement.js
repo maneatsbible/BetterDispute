@@ -15,7 +15,7 @@ export class Agreement {
    * @param {number} personId    GitHub user id of the agreeing person
    * @param {string} login       GitHub login (resolved separately)
    * @param {string} createdAt   ISO 8601 string
-   * @param {object} meta        Parsed BD:META object
+   * @param {object} meta        Parsed DSP:META object
    */
   constructor(id, assertionId, personId, login, createdAt, meta) {
     this.id          = id;

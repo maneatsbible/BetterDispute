@@ -49,7 +49,7 @@ export class DisputeController {
   async loadPostTree(rootId) {
     // GitHub Issues search by body content is unreliable — query by label trios
     // and filter by rootId.
-    const labels   = ['bd:assertion', 'bd:challenge', 'bd:answer'];
+    const labels   = ['dsp:assertion', 'dsp:challenge', 'dsp:answer'];
     const allPosts = [];
 
     for (const label of labels) {
@@ -73,7 +73,7 @@ export class DisputeController {
    * @returns {Promise<CricketsConditions|null>}
    */
   async loadCricketsConditions(disputeId) {
-    const url = `${gh.issuesUrl(this._dataRepo)}?labels=bd%3Acrickets-conditions&state=open&per_page=100`;
+    const url = `${gh.issuesUrl(this._dataRepo)}?labels=dsp%3Acrickets-conditions&state=open&per_page=100`;
     const issues = await gh.get(url, this._token);
     const matched = issues
       .map(i => CricketsConditions.fromIssue(i))
@@ -88,7 +88,7 @@ export class DisputeController {
    * @returns {Promise<CricketsEvent|null>}
    */
   async loadCricketsEvent(disputeId) {
-    const url = `${gh.issuesUrl(this._dataRepo)}?labels=bd%3Acrickets-event&state=open&per_page=100`;
+    const url = `${gh.issuesUrl(this._dataRepo)}?labels=dsp%3Acrickets-event&state=open&per_page=100`;
     const issues = await gh.get(url, this._token);
     const matched = issues
       .map(i => CricketsEvent.fromIssue(i))
@@ -153,7 +153,7 @@ export class DisputeController {
     const answerMeta = {
       type:               POST_TYPE_ANSWER,
       version:            1,
-      appId:              'better-dispute',
+      appId:              gh.APP_ID,
       parentId:           challenge.id,
       rootId:             challenge.rootId,
       disputeId:          dispute.id,
@@ -164,7 +164,7 @@ export class DisputeController {
     const answer = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Answer to #${challenge.id} in dispute #${dispute.id}`,
       body:   gh.buildBody(answerMeta, text ?? ''),
-      labels: ['bd:answer'],
+      labels: ['dsp:answer'],
     }, this._token);
 
     let ccIssue = null;
@@ -172,7 +172,7 @@ export class DisputeController {
       const ccMeta = {
         type:          POST_TYPE_CHALLENGE,
         version:       1,
-        appId:         'better-dispute',
+        appId:         gh.APP_ID,
         parentId:      answer.number,
         rootId:        challenge.rootId,
         disputeId:     dispute.id,
@@ -181,7 +181,7 @@ export class DisputeController {
       ccIssue = await gh.post(gh.issuesUrl(this._dataRepo), {
         title:  `Counter-challenge in dispute #${dispute.id}`,
         body:   gh.buildBody(ccMeta, counterChallenge.text),
-        labels: ['bd:challenge'],
+        labels: ['dsp:challenge'],
       }, this._token);
 
       // Backfill counterChallengeId into the Answer.
@@ -243,7 +243,7 @@ export class DisputeController {
     const meta = {
       type:               'assertion',
       version:            1,
-      appId:              'better-dispute',
+      appId:              gh.APP_ID,
       parentId:           dispute.rootPostId,
       rootId:             dispute.rootPostId,
       isOffer:            true,
@@ -255,7 +255,7 @@ export class DisputeController {
     const offer   = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Offer in dispute #${dispute.id}: ${text.slice(0, 60)}`,
       body:   gh.buildBody(meta, content),
-      labels: ['bd:assertion', 'bd:offer'],
+      labels: ['dsp:assertion', 'dsp:offer'],
     }, this._token);
 
     cache.invalidatePattern(gh.issueUrl(this._dataRepo, dispute.id));
@@ -288,7 +288,7 @@ export class DisputeController {
    */
   async acceptOffer(person, dispute) {
     await gh.patch(gh.issueUrl(this._dataRepo, dispute.id), {
-      labels: ['bd:dispute', 'bd:resolved'],
+      labels: ['dsp:dispute', 'dsp:resolved'],
     }, this._token);
 
     cache.invalidate(gh.issueUrl(this._dataRepo, dispute.id));
@@ -324,7 +324,7 @@ export class DisputeController {
     const meta = {
       type:               'crickets-conditions',
       version:            1,
-      appId:              'better-dispute',
+      appId:              gh.APP_ID,
       disputeId:          dispute.id,
       proposedByPersonId: person.id,
       agreedByPersonId:   null,
@@ -336,7 +336,7 @@ export class DisputeController {
     return gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Crickets proposal for dispute #${dispute.id}`,
       body:   gh.buildBody(meta, body),
-      labels: ['bd:crickets-conditions'],
+      labels: ['dsp:crickets-conditions'],
     }, this._token);
   }
 
@@ -370,7 +370,7 @@ export class DisputeController {
     const meta   = {
       type:                 'crickets-event',
       version:              1,
-      appId:                'better-dispute',
+      appId:                gh.APP_ID,
       disputeId:            dispute.id,
       challengeId:          challenge.id,
       triggeredByPersonId:  person.id,
@@ -382,12 +382,12 @@ export class DisputeController {
     const event = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Crickets in dispute #${dispute.id}`,
       body:   gh.buildBody(meta, body),
-      labels: ['bd:crickets-event'],
+      labels: ['dsp:crickets-event'],
     }, this._token);
 
-    // Add bd:crickets-event label to the Dispute issue.
-    const currentLabels = dispute.labelNames ?? ['bd:dispute', 'bd:active'];
-    const newLabels = [...new Set([...currentLabels, 'bd:crickets-event'])];
+    // Add dsp:crickets-event label to the Dispute issue.
+    const currentLabels = dispute.labelNames ?? ['dsp:dispute', 'dsp:active'];
+    const newLabels = [...new Set([...currentLabels, 'dsp:crickets-event'])];
     await gh.patch(gh.issueUrl(this._dataRepo, dispute.id), {
       labels: newLabels,
     }, this._token);
@@ -420,7 +420,7 @@ export class DisputeController {
     const meta = {
       type:               'dispute',
       version:            1,
-      appId:              'better-dispute',
+      appId:              gh.APP_ID,
       challengerId:       person.id,
       defenderId:         cricketsEvent.triggeredByPersonId,
       rootPostId:         originalDispute.rootPostId,
@@ -431,7 +431,7 @@ export class DisputeController {
     return gh.post(gh.issuesUrl(this._dataRepo), {
       title,
       body:   gh.buildBody(meta, title),
-      labels: ['bd:dispute', 'bd:active'],
+      labels: ['dsp:dispute', 'dsp:active'],
     }, this._token);
   }
 
@@ -447,7 +447,7 @@ export class DisputeController {
    */
   async loadPendingDisputes() {
     if (!this._currentUser) return [];
-    const url = `${gh.issuesUrl(this._dataRepo)}?labels=bd%3Adispute%2Cbd%3Aactive&state=open&per_page=100`;
+    const url = `${gh.issuesUrl(this._dataRepo)}?labels=dsp%3Adispute%2Cdsp%3Aactive&state=open&per_page=100`;
     const issues = await gh.get(url, this._token);
     return issues
       .map(i => Dispute.fromIssue(i))

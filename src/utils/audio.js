@@ -1,5 +1,5 @@
 /**
- * Audio utilities for Better Dispute.
+ * Audio utilities for disputable.io.
  * Uses Web Audio API — no external audio files required.
  */
 

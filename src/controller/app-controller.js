@@ -5,8 +5,8 @@
  * Handles Device Flow sign-in and re-renders on popstate.
  *
  * Views communicate back via CustomEvents on #app-main:
- *   - bd:navigate  { view, id }
- *   - bd:card-action { action, postId }
+ *   - dsp:navigate  { view, id }
+ *   - dsp:card-action { action, postId }
  */
 
 import { HomeController }    from './home-controller.js';
@@ -51,13 +51,13 @@ export class AppController {
    * @param {{ view: string|null, id: string|null, post: string|null }} params
    */
   async init(params) {
-    this._main.addEventListener('bd:navigate', e => {
+    this._main.addEventListener('dsp:navigate', e => {
       const { view, id } = e.detail;
       if (view === 'home')    { setUrlParams({}); this.navigate({}); }
       if (view === 'dispute') { setUrlParams({ view: 'dispute', id: String(id) }); this.navigate({ view: 'dispute', id: String(id) }); }
     });
 
-    this._main.addEventListener('bd:card-action', e => {
+    this._main.addEventListener('dsp:card-action', e => {
       this._handleCardAction(e.detail);
     });
 
@@ -91,8 +91,8 @@ export class AppController {
       });
 
       // Load disputes and agreements for permission gates.
-      const dispUrl = `${gh.issuesUrl(this._config.dataRepo)}?labels=bd%3Adispute&state=open&per_page=100`;
-      const agreeUrl = `${gh.issuesUrl(this._config.dataRepo)}?labels=bd%3Aagreement&state=open&per_page=100`;
+      const dispUrl = `${gh.issuesUrl(this._config.dataRepo)}?labels=dsp%3Adispute&state=open&per_page=100`;
+      const agreeUrl = `${gh.issuesUrl(this._config.dataRepo)}?labels=dsp%3Aagreement&state=open&per_page=100`;
 
       const [dispIssues, agreeIssues] = await Promise.all([
         gh.get(dispUrl, this._token).catch(() => []),
@@ -163,9 +163,9 @@ export class AppController {
     this._main.innerHTML = `
       <div class="auth-screen">
         <div class="auth-screen__logo">⚖️</div>
-        <h1 class="auth-screen__title">Better Dispute</h1>
+        <h1 class="auth-screen__title">${this._config.appName ?? 'disputable.io'}</h1>
         <p class="auth-screen__sub">
-          Sign in with GitHub to view and participate in disputes.
+          Sign in with GitHub to read and join disputes on disputable.io.
         </p>
         <button class="btn btn--primary" id="signin-btn">Sign in with GitHub</button>
       </div>

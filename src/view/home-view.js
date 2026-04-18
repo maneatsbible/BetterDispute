@@ -104,7 +104,7 @@ export class HomeView {
           );
           if (disputeForCard) {
             setUrlParams({ view: 'dispute', id: String(disputeForCard.id) });
-            this._root.dispatchEvent(new CustomEvent('bd:navigate', {
+            this._root.dispatchEvent(new CustomEvent('dsp:navigate', {
               bubbles: true,
               detail: { view: 'dispute', id: disputeForCard.id },
             }));
@@ -195,7 +195,7 @@ export class HomeView {
     const postId = Number(card.dataset.postId);
 
     // Trigger will be handled by the controller/view layer above.
-    this._root.dispatchEvent(new CustomEvent('bd:card-action', {
+    this._root.dispatchEvent(new CustomEvent('dsp:card-action', {
       bubbles: true,
       detail: { action, postId },
     }));

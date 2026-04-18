@@ -1,5 +1,5 @@
 /**
- * Better Dispute — Custom micro test-runner
+ * disputable.io custom micro test-runner
  * Pure JavaScript, no external dependencies.
  * Run with: node --experimental-vm-modules tests/runner.js
  */
@@ -11,6 +11,7 @@ const _failures = [];
 let _beforeEachFn = null;
 let _afterEachFn = null;
 let _currentSuite = '';
+let _testQueue = Promise.resolve();
 
 /**
  * @param {string} name
@@ -28,18 +29,25 @@ export function describe(name, fn) {
  */
 export async function it(name, fn) {
   const label = _currentSuite ? `${_currentSuite} > ${name}` : name;
-  try {
-    if (_beforeEachFn) await _beforeEachFn();
-    await fn();
-    if (_afterEachFn) await _afterEachFn();
-    _passed++;
-    console.log(`  ✓ ${label}`);
-  } catch (err) {
-    _failed++;
-    _failures.push({ label, err });
-    console.error(`  ✗ ${label}`);
-    console.error(`    ${err.message}`);
-  }
+  const beforeEachFn = _beforeEachFn;
+  const afterEachFn = _afterEachFn;
+
+  _testQueue = _testQueue.then(async () => {
+    try {
+      if (beforeEachFn) await beforeEachFn();
+      await fn();
+      if (afterEachFn) await afterEachFn();
+      _passed++;
+      console.log(`  ✓ ${label}`);
+    } catch (err) {
+      _failed++;
+      _failures.push({ label, err });
+      console.error(`  ✗ ${label}`);
+      console.error(`    ${err.message}`);
+    }
+  });
+
+  return _testQueue;
 }
 
 /** @param {() => void | Promise<void>} fn */
@@ -97,7 +105,8 @@ export function expect(actual) {
 }
 
 /** Print summary and exit with appropriate code. */
-export function summary() {
+export async function summary() {
+  await _testQueue;
   console.log(`\n${_passed + _failed} tests: ${_passed} passed, ${_failed} failed`);
   if (_failures.length) {
     console.error('\nFailed tests:');

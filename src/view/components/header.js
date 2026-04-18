@@ -25,7 +25,7 @@ export function renderHeader(version, { userLogin = null } = {}) {
               aria-label="Go to home / assertions feed">
         ${ICON_SCALES}
       </button>
-      <span class="header-title">Better Dispute</span>
+      <span class="header-title">disputable.io</span>
       <span class="header-right">
         ${userLogin
           ? `<span class="header-user">@${_escape(userLogin)}</span>`

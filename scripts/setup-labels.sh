@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # scripts/setup-labels.sh
-# Creates all required bd:* GitHub labels in the specified repository.
+# Creates all required dsp:* GitHub labels in the specified repository.
 # Usage: bash scripts/setup-labels.sh owner/repo
 # Requires: GitHub CLI (gh) authenticated with repo scope.
 
@@ -30,17 +30,17 @@ create_label() {
   fi
 }
 
-echo "Setting up Better Dispute labels in $REPO ..."
+echo "Setting up disputable.io labels in $REPO ..."
 
-create_label "bd:assertion"           "e3b341" "Assertion post"
-create_label "bd:challenge"           "bc8cff" "Challenge post"
-create_label "bd:answer"              "3fb950" "Answer post"
-create_label "bd:dispute"             "f85149" "Dispute instance"
-create_label "bd:agreement"           "58a6ff" "Agreement record"
-create_label "bd:offer"               "d29922" "Resolution offer"
-create_label "bd:crickets-conditions" "8b949e" "Crickets negotiation"
-create_label "bd:crickets-event"      "ff7b72" "Crickets expiry event"
-create_label "bd:active"              "238636" "Active dispute/process"
-create_label "bd:resolved"            "484f58" "Resolved dispute"
+create_label "dsp:assertion"           "e3b341" "Assertion post"
+create_label "dsp:challenge"           "bc8cff" "Challenge post"
+create_label "dsp:answer"              "3fb950" "Answer post"
+create_label "dsp:dispute"             "f85149" "Dispute instance"
+create_label "dsp:agreement"           "58a6ff" "Agreement record"
+create_label "dsp:offer"               "d29922" "Resolution offer"
+create_label "dsp:crickets-conditions" "8b949e" "Crickets negotiation"
+create_label "dsp:crickets-event"      "ff7b72" "Crickets expiry event"
+create_label "dsp:active"              "238636" "Active dispute/process"
+create_label "dsp:resolved"            "484f58" "Resolved dispute"
 
 echo "Done."

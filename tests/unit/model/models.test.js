@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect } from '../../runner.js';
+import { APP_ID } from '../../../src/api/github-client.js';
 import { Person } from '../../../src/model/person.js';
 import {
   Post, Assertion, Challenge, Answer,
@@ -19,8 +20,8 @@ import { Agreement, CricketsConditions, CricketsEvent }
 // ---------------------------------------------------------------------------
 
 function makeIssue(number, type, meta, extraMeta = {}) {
-  const fullMeta = { type, version: 1, appId: 'better-dispute', ...meta, ...extraMeta };
-  const body = `<!-- BD:META\n${JSON.stringify(fullMeta)}\n-->\n\nTest content`;
+  const fullMeta = { type, version: 1, appId: APP_ID, ...meta, ...extraMeta };
+  const body = `<!-- DSP:META\n${JSON.stringify(fullMeta)}\n-->\n\nTest content`;
   return {
     number,
     user:        { login: 'alice', id: 1001 },
@@ -35,11 +36,11 @@ function makeIssue(number, type, meta, extraMeta = {}) {
 // ---------------------------------------------------------------------------
 
 describe('Person', () => {
-  it('constructs with id/login/avatarUrl', () => {
+  it('constructs with id/login/profilePicUrl', () => {
     const p = new Person(1001, 'alice', 'https://example.com/avatar.jpg');
     expect(p.id).toBe(1001);
     expect(p.login).toBe('alice');
-    expect(p.avatarUrl).toBe('https://example.com/avatar.jpg');
+    expect(p.profilePicUrl).toBe('https://example.com/avatar.jpg');
   });
 
   it('fromGitHubUser factory maps correctly', () => {
@@ -47,7 +48,7 @@ describe('Person', () => {
     const p = Person.fromGitHubUser(ghUser);
     expect(p.id).toBe(42);
     expect(p.login).toBe('bob');
-    expect(p.avatarUrl).toBe('https://img.example.com/b');
+    expect(p.profilePicUrl).toBe('https://img.example.com/b');
   });
 
   it('isStrawman returns true for matching login (case-insensitive)', () => {
@@ -63,7 +64,7 @@ describe('Person', () => {
 // ---------------------------------------------------------------------------
 
 describe('Post.fromIssue', () => {
-  it('returns null for an issue without BD:META', () => {
+  it('returns null for an issue without DSP:META', () => {
     const issue = { number: 1, user: { login: 'a', id: 1 }, body: 'no meta', created_at: '', labels: [] };
     expect(Post.fromIssue(issue)).toBeNull();
   });
@@ -99,31 +100,31 @@ describe('Post.fromIssue', () => {
 // ---------------------------------------------------------------------------
 
 describe('Dispute.fromIssue', () => {
-  it('derives active status from bd:active label', () => {
+  it('derives active status from dsp:active label', () => {
     const issue = makeIssue(1, 'dispute', {
       challengerId: 10, defenderId: 20, rootPostId: 5, triggerChallengeId: 8,
     });
-    issue.labels = [{ name: 'bd:dispute' }, { name: 'bd:active' }];
+    issue.labels = [{ name: 'dsp:dispute' }, { name: 'dsp:active' }];
     const d = Dispute.fromIssue(issue);
     expect(d.status).toBe(DISPUTE_STATUS_ACTIVE);
     expect(d.isActive).toBe(true);
   });
 
-  it('derives resolved status from bd:resolved label', () => {
+  it('derives resolved status from dsp:resolved label', () => {
     const issue = makeIssue(2, 'dispute', {
       challengerId: 10, defenderId: 20, rootPostId: 5, triggerChallengeId: 8,
     });
-    issue.labels = [{ name: 'bd:dispute' }, { name: 'bd:resolved' }];
+    issue.labels = [{ name: 'dsp:dispute' }, { name: 'dsp:resolved' }];
     const d = Dispute.fromIssue(issue);
     expect(d.status).toBe(DISPUTE_STATUS_RESOLVED);
     expect(d.isResolved).toBe(true);
   });
 
-  it('derives crickets status from bd:crickets-event label', () => {
+  it('derives crickets status from dsp:crickets-event label', () => {
     const issue = makeIssue(3, 'dispute', {
       challengerId: 10, defenderId: 20, rootPostId: 5, triggerChallengeId: 8,
     });
-    issue.labels = [{ name: 'bd:dispute' }, { name: 'bd:active' }, { name: 'bd:crickets-event' }];
+    issue.labels = [{ name: 'dsp:dispute' }, { name: 'dsp:active' }, { name: 'dsp:crickets-event' }];
     const d = Dispute.fromIssue(issue);
     expect(d.status).toBe(DISPUTE_STATUS_CRICKETS);
     expect(d.isCrickets).toBe(true);

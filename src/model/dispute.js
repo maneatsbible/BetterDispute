@@ -22,7 +22,7 @@ export class Dispute {
    * @param {number}   triggerChallengeId First challenge that created this dispute
    * @param {string}   status             DISPUTE_STATUS_*
    * @param {string}   createdAt          ISO 8601 string
-   * @param {object}   meta               Parsed BD:META object
+   * @param {object}   meta               Parsed DSP:META object
    * @param {string[]} labelNames         Current label names on the issue
    */
   constructor(
@@ -89,7 +89,7 @@ export class Dispute {
 // ---------------------------------------------------------------------------
 
 function _deriveStatus(labelNames) {
-  if (labelNames.includes('bd:crickets-event')) return DISPUTE_STATUS_CRICKETS;
-  if (labelNames.includes('bd:resolved'))       return DISPUTE_STATUS_RESOLVED;
+  if (labelNames.includes('dsp:crickets-event')) return DISPUTE_STATUS_CRICKETS;
+  if (labelNames.includes('dsp:resolved'))       return DISPUTE_STATUS_RESOLVED;
   return DISPUTE_STATUS_ACTIVE;
 }

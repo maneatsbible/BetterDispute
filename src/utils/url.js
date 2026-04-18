@@ -1,5 +1,5 @@
 /**
- * URL parameter helpers for Better Dispute.
+ * URL parameter helpers for disputable.io.
  * All navigation is driven by query params.
  */
 

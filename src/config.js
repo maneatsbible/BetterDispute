@@ -2,14 +2,17 @@
 // src/config.js is gitignored — never commit it.
 
 export const CONFIG = {
+  /** Product name shown in user-facing chrome */
+  appName: 'disputable.io',
+
   /** GitHub OAuth App Client ID (public — safe to share) */
   githubClientId: 'Iv23lijU8slblZnF4ofj',
 
-  /** owner/repo of the shared data repository, e.g. "myorg/bd-data" */
-  dataRepo: 'maneatsbible/bd-data',
+  /** owner/repo of the shared data repository, e.g. "myorg/disputable-data" */
+  dataRepo: 'maneatsbible/dsp-data',
 
   /** GitHub login of the @strawman account */
-  strawmanLogin: 'bd-strawman',
+  strawmanLogin: 'dsp-strawman',
 
   /** App version shown in the header */
   appVersion: '0.1.0',
