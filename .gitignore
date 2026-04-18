@@ -4,8 +4,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local config (contains repo name / client ID)
-src/config.js
 .env
 .env.*
 

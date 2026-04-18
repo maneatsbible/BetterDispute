@@ -10,6 +10,22 @@
   <header id="app-header" role="banner"></header>
   <main id="app-main" role="main"></main>
   <div id="notification-root" aria-live="polite" aria-atomic="false"></div>
+  <div id="bd-error" role="alert"></div>
+  <!-- Early error catcher — runs before module graph loads -->
+  <script>
+    function _bdShowError(msg) {
+      var el = document.getElementById('bd-error');
+      if (!el) return;
+      el.textContent = '⚠ ' + msg;
+      el.style.display = 'block';
+    }
+    window.addEventListener('error', function(e) {
+      _bdShowError((e.message || 'Unknown error') + (e.filename ? '  (' + e.filename.split('/').pop() + ':' + e.lineno + ')' : ''));
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      _bdShowError(e.reason?.message || String(e.reason) || 'Unhandled rejection');
+    });
+  </script>
   <script type="module" src="src/app.js"></script>
 </body>
 </html>

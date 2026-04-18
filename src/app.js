@@ -44,9 +44,9 @@ async function bootstrap() {
 
 bootstrap().catch(err => {
   console.error('[BD] Fatal bootstrap error:', err);
-  const main = document.getElementById('app-main');
-  if (main) {
-    main.innerHTML =
-      `<p class="error-message">Failed to start Better Dispute: ${err.message}</p>`;
+  const panel = document.getElementById('bd-error');
+  if (panel) {
+    panel.textContent = `⚠ ${err.message}`;
+    panel.style.display = 'block';
   }
 });
