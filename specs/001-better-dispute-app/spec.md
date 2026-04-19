@@ -257,7 +257,7 @@ When a SimilarityLink between two Records reaches STANDING state, the system sur
 - **FR-023**: Either party in a Duel MAY submit an Offer proposing resolution at any time; Offers MUST NOT pause or block the Challenge/Answer turn sequence.
 - **FR-024**: The other party MUST be able to accept (producing an Accord and a Disposition of type=accord) or reject the Offer.
 - **FR-025**: Either party MAY propose DeadlineConditions (countdown per turn); conditions MUST be mutually agreed before activation. The absolute deadline timestamp MUST be stored in the Duel's GitHub Issue body.
-- **FR-026**: Upon expiry of agreed DeadlineConditions, the first client to load the Duel View past the deadline MUST write a Default Disposition as a new GitHub Issue, then display it prominently with a visual indicator and an audio cue (Web Audio API chirp).
+- **FR-026**: Upon expiry of agreed DeadlineConditions, the **server** (node-cron, 1-minute tick) MUST detect the expiry and write a Default Disposition record. The client displays the Default event prominently with a visual indicator and an audio cue (Web Audio API chirp) when it next loads or polls the Duel. Server-side detection removes the race condition of multiple clients simultaneously writing a Default.
 - **FR-027**: A Default Disposition MAY be challenged by the defaulting party, opening a nested Case against the Disposition Record.
 
 **ClaimAccords and Base of Truth**
