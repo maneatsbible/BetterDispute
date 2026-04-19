@@ -18,6 +18,7 @@ import { renderPostCard }      from './components/post-card.js';
 import { renderComposer }      from './components/composer.js';
 import { showNotification }    from './components/notification.js';
 import { setUrlParams }        from '../utils/url.js';
+import { ICON_BACK }           from '../utils/icons.js';
 import { playCricketsChirp }   from '../utils/audio.js';
 import { POST_TYPE_CHALLENGE } from '../model/post.js';
 
@@ -82,15 +83,28 @@ export class DisputeView {
     const container = document.createElement('div');
     container.className = 'dispute-view';
 
-    // Lineage header (clicking the root assertion navigates home)
-    const lineage = _buildLineage(dispute, postTree);
-    lineage.querySelector('.dispute-view__lineage-home')?.addEventListener('click', () => {
+    // Icon-only back button
+    const backBtn = document.createElement('button');
+    backBtn.className = 'dispute-view__back icon-btn';
+    backBtn.innerHTML = ICON_BACK;
+    backBtn.setAttribute('aria-label', 'Back to home feed');
+    backBtn.addEventListener('click', () => {
       setUrlParams({});
       this._root.dispatchEvent(new CustomEvent('dsp:navigate', {
         bubbles: true, detail: { view: 'home' },
       }));
     });
-    lineage.querySelector('.dispute-view__lineage-home')?.addEventListener('keydown', e => {
+    container.appendChild(backBtn);
+
+    // Lineage header (assertion title is a clickable link home)
+    const lineage = _buildLineage(dispute, postTree);
+    lineage.querySelector('.dispute-view__lineage-link')?.addEventListener('click', () => {
+      setUrlParams({});
+      this._root.dispatchEvent(new CustomEvent('dsp:navigate', {
+        bubbles: true, detail: { view: 'home' },
+      }));
+    });
+    lineage.querySelector('.dispute-view__lineage-link')?.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         setUrlParams({});
@@ -373,10 +387,10 @@ function _buildLineage(dispute, postTree) {
     : `#${dispute.rootPostId}`;
 
   root.innerHTML = `
-    <span class="dispute-view__lineage-item dispute-view__lineage-home"
-          role="button" tabindex="0" aria-label="Back to home feed">
+    <a class="dispute-view__lineage-link" role="link" tabindex="0"
+       aria-label="Back to home feed">
       ${_esc(summary)}
-    </span>
+    </a>
     <span class="dispute-view__lineage-sep"> → </span>
     <span>Dispute #${dispute.id}</span>
   `.trim();

@@ -94,11 +94,11 @@
 - [X] T035 [US3] Implement `canAnswer(person, challenge)` in `dispute-controller.js`: must be current turn, challenge must be unanswered in `src/controller/dispute-controller.js`
 - [X] T036 [US3] Implement `canCounterChallenge(person, answer)` in `dispute-controller.js`: person is answerer AND counter-challenge slot is empty in `src/controller/dispute-controller.js`
 - [X] T037 [US3] Implement `submitAnswer(person, challenge, { yesNo, text, counterChallenge })` in `dispute-controller.js`: write Answer Issue; if `counterChallenge` present write Challenge Issue with `counterChallengeId` ref; update turn; invalidate dispute cache in `src/controller/dispute-controller.js`
-- [X] T038 [US3] Implement `src/view/dispute-view.js` — single-lane layout: lineage header (parent chain with `→` separators), chronological Post cards, "Your turn" indicator, back button in `src/view/dispute-view.js`
+- [X] T038 [US3] Implement `src/view/dispute-view.js` — single-lane layout: lineage header (parent chain with `→` separators; root assertion is a clickable link back to home), chronological Post cards, "Your turn" indicator, icon-only back button (`←`) in `src/view/dispute-view.js`
 - [X] T039 [US3] Implement two-lane layout switch in `dispute-view.js`: when `dispute.hasCounterChallenge === true`, render challenges in left lane and counter-challenges in right lane, interleaved by `createdAt` in `src/view/dispute-view.js`
 - [X] T040 [US3] Extend `composer.js` for Answer mode: Yes/No radio buttons (Interrogatory only), free-text field, optional counter-challenge sub-section (collapsed by default) in `src/view/components/composer.js`
 - [X] T041 [US3] Add Answer icon button (✓) to Post cards in Dispute View: disabled when `!canAnswer(...)`; opens Answer composer on click in `src/view/components/post-card.js`
-- [X] T042 [US3] Wire navigation: clicking a Home card sets URL params `?view=dispute&id={id}` and renders `dispute-view.js`; back button sets URL to Home in `src/controller/app-controller.js`
+- [X] T042 [US3] Wire navigation: clicking a Home card sets URL params `?view=dispute&id={id}` and renders `dispute-view.js`; icon-only back button and lineage root link both navigate to Home in `src/controller/app-controller.js`
 - [X] T043 [US3] Create `src/controller/app-controller.js` — top-level router: reads URL params, instantiates correct controller+view, re-renders on `popstate` in `src/controller/app-controller.js`
 - [X] T044 [US3] Highlight latest actionable Post in Dispute View: apply `.card--latest-action` CSS class with accent border to the most recent unanswered challenge in `src/view/dispute-view.js` and `styles/main.css`
 
