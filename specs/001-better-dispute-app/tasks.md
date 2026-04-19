@@ -176,7 +176,7 @@
 - [X] T075 Run `npx c8 check-coverage --lines 85 --functions 85 --branches 80` and fix any gaps
 - [X] T076 Final CSS pass: verify `--color-disabled` on all disabled controls, terminal card dimming, resolved card muting, two-lane layout on narrow viewport, stacked shadow depth on all card variants in `styles/main.css`
 - [X] T077 Run quickstart.md validation: fresh clone → setup labels script → local HTTP server → Device Flow sign-in → compose assertion → challenge it → answer it; document any corrections in `specs/001-better-dispute-app/quickstart.md`
-- [ ] T092 [P] Implement structured in-browser logging and an enhanced page-render error panel:
+- [X] T092 [P] Implement structured in-browser logging and an enhanced page-render error panel:
   - **Logger** (`src/utils/logger.js`): singleton with `log(level, context, message, data)` — levels `debug|info|warn|error`; appends timestamped entries to an in-memory circular buffer (last 200 entries); mirrors to `console` at matching level; exposed on `window.__bdLogger` for DevTools access.
   - **Error panel** (`src/view/components/error-panel.js`): `showErrorPanel(error, context)` replaces the current `<main>` content on unrecoverable render failures; displays: human-readable summary, full stack trace in a scrollable `<pre>`, structured log dump (all buffered entries as JSON), copy-to-clipboard button for the complete debug bundle (error + stack + logs + `navigator.userAgent` + `window.location.href` + timestamp), and a "Retry" button that calls `window.location.reload()`.
   - Wire into `src/app.js`: wrap top-level bootstrap in `try/catch`; on catch call `logger.error('app', 'Bootstrap failed', err)` then `showErrorPanel(err, 'app bootstrap')`.
