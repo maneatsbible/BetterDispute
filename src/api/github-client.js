@@ -120,13 +120,19 @@ function _mockGet(url) {
 
 // Mock implementation of POST (create issue).
 function _mockPost(url, body) {
+  let mockAuthor = { login: 'mock-user', id: 9999 };
+  try {
+    const login  = localStorage.getItem('dsp:auth:login');
+    const userId = Number(localStorage.getItem('dsp:auth:userId'));
+    if (login && userId) mockAuthor = { login, id: userId };
+  } catch { /* ignore */ }
   const issue = _normalise({
     number:     _mockNextId++,
     title:      body.title ?? '',
     body:       body.body  ?? '',
     state:      'open',
     labels:     (body.labels ?? []).map(l => (typeof l === 'string' ? { name: l } : l)),
-    user:       { login: 'mock-user', id: 9999 },
+    user:       mockAuthor,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   });
