@@ -5,7 +5,7 @@
  * dispute tree stored as GitHub Issues.
  */
 
-import { parseBody } from '../api/github-client.js';
+import { parseBody, verifyBodyHash } from '../api/github-client.js';
 
 export const POST_TYPE_ASSERTION = 'assertion';
 export const POST_TYPE_CHALLENGE = 'challenge';
@@ -27,21 +27,26 @@ export class Post {
    * @param {string}      content      Human-readable body (stripped of DSP:META)
    * @param {string}      createdAt    ISO 8601 string
    * @param {object}      meta         Parsed DSP:META object
+   * @param {Promise<boolean|null>} hashVerified  Resolves to true/false/null
    */
-  constructor(id, type, authorLogin, authorId, content, createdAt, meta) {
-    this.id          = id;
-    this.type        = type;
-    this.authorLogin = authorLogin;
-    this.authorId    = authorId;
-    this.content     = content;
-    this.createdAt   = createdAt;
-    this.meta        = meta;
+  constructor(id, type, authorLogin, authorId, content, createdAt, meta, hashVerified = Promise.resolve(null)) {
+    this.id           = id;
+    this.type         = type;
+    this.authorLogin  = authorLogin;
+    this.authorId     = authorId;
+    this.content      = content;
+    this.createdAt    = createdAt;
+    this.meta         = meta;
+    /** @type {Promise<boolean|null>} Resolves to true (ok), false (tampered), null (no hash) */
+    this.hashVerified = hashVerified;
   }
 
   /** Factory: create the appropriate Post subclass from a GitHub Issue object. */
   static fromIssue(issue) {
     const meta = parseBody(issue.body);
     if (!meta) return null;
+
+    const hashVerified = verifyBodyHash(issue.body);
 
     const base = [
       issue.number,
@@ -51,6 +56,7 @@ export class Post {
       _extractContent(issue.body),
       issue.created_at,
       meta,
+      hashVerified,
     ];
 
     switch (meta.type) {

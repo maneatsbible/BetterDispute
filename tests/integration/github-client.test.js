@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach } from '../runner.js';
 import {
   get, post, patch, buildBody, parseBody, issueUrl, issuesUrl, ApiError, APP_ID,
+  computeContentHash, buildBodyWithHash, verifyBodyHash,
 } from '../../src/api/github-client.js';
 
 // ---------------------------------------------------------------------------
@@ -154,5 +155,78 @@ describe('github-client.patch', () => {
     mockFetch({ status: 200, body: { number: 5 } });
     await patch('https://api.github.com/repos/x/y/issues/5', { body: 'updated' }, 'tok');
     expect(_fetchCalls[0].opts.method).toBe('PATCH');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Content hashing
+// ---------------------------------------------------------------------------
+
+describe('computeContentHash', () => {
+  it('returns a 64-character hex string', async () => {
+    const meta = { type: 'assertion', version: 1, appId: APP_ID };
+    const hash = await computeContentHash(meta, 'hello');
+    expect(typeof hash).toBe('string');
+    expect(hash.length).toBe(64);
+    expect(/^[0-9a-f]+$/.test(hash)).toBe(true);
+  });
+
+  it('produces the same hash for identical inputs', async () => {
+    const meta = { type: 'assertion', version: 1, appId: APP_ID };
+    const h1 = await computeContentHash(meta, 'hello');
+    const h2 = await computeContentHash(meta, 'hello');
+    expect(h1).toBe(h2);
+  });
+
+  it('produces different hashes for different content', async () => {
+    const meta = { type: 'assertion', version: 1, appId: APP_ID };
+    const h1 = await computeContentHash(meta, 'hello');
+    const h2 = await computeContentHash(meta, 'world');
+    expect(h1).not.toBe(h2);
+  });
+
+  it('ignores any existing hash field to avoid circular dependency', async () => {
+    const meta     = { type: 'assertion', version: 1, appId: APP_ID };
+    const metaWith = { ...meta, hash: 'oldvalue' };
+    const h1 = await computeContentHash(meta, 'hello');
+    const h2 = await computeContentHash(metaWith, 'hello');
+    expect(h1).toBe(h2);
+  });
+});
+
+describe('buildBodyWithHash / verifyBodyHash', () => {
+  it('embeds a hash in the meta block', async () => {
+    const meta = { type: 'assertion', version: 1, appId: APP_ID };
+    const body = await buildBodyWithHash(meta, 'some content');
+    const parsed = parseBody(body);
+    expect(typeof parsed.hash).toBe('string');
+    expect(parsed.hash.length).toBe(64);
+  });
+
+  it('verifyBodyHash returns true for a freshly built body', async () => {
+    const meta = { type: 'challenge', version: 1, appId: APP_ID, parentId: 1, rootId: 1 };
+    const body = await buildBodyWithHash(meta, 'challenge text');
+    const result = await verifyBodyHash(body);
+    expect(result).toBe(true);
+  });
+
+  it('verifyBodyHash returns false when content has been tampered', async () => {
+    const meta = { type: 'assertion', version: 1, appId: APP_ID };
+    const body = await buildBodyWithHash(meta, 'original');
+    const tampered = body.replace('original', 'tampered');
+    const result = await verifyBodyHash(tampered);
+    expect(result).toBe(false);
+  });
+
+  it('verifyBodyHash returns null for a legacy body without a hash', async () => {
+    const meta = { type: 'assertion', version: 1, appId: APP_ID };
+    const body = buildBody(meta, 'no hash here');
+    const result = await verifyBodyHash(body);
+    expect(result).toBeNull();
+  });
+
+  it('verifyBodyHash returns null for a body without DSP:META', async () => {
+    const result = await verifyBodyHash('plain text, no meta');
+    expect(result).toBeNull();
   });
 });

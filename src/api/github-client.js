@@ -267,6 +267,72 @@ export function buildBody(meta, content = '') {
 }
 
 /**
+ * Extract the human-readable content portion from an issue body
+ * (the text after the closing DSP:META comment).
+ *
+ * @param {string} issueBody
+ * @returns {string}
+ */
+export function extractContent(issueBody) {
+  if (!issueBody) return '';
+  const end = issueBody.indexOf(META_CLOSE);
+  if (end === -1) return issueBody.trim();
+  return issueBody.slice(end + META_CLOSE.length).trim();
+}
+
+/**
+ * Compute a SHA-256 content hash over the canonical fields of a record.
+ *
+ * The hash covers all meta fields (excluding any existing `hash` key) plus
+ * the human-readable content, serialised with sorted keys to ensure
+ * determinism.
+ *
+ * @param {object} meta    DSP:META object (without a `hash` field)
+ * @param {string} content Human-readable body text
+ * @returns {Promise<string>} Lowercase hex digest
+ */
+export async function computeContentHash(meta, content = '') {
+  // Exclude `hash` from the input to avoid a circular dependency.
+  const { hash: _removed, ...metaWithoutHash } = meta;
+  const sortedKeys = Object.keys(metaWithoutHash).sort();
+  const canonical  = JSON.stringify(metaWithoutHash, sortedKeys) + '\n' + content;
+  const encoded    = new TextEncoder().encode(canonical);
+  const buffer     = await crypto.subtle.digest('SHA-256', encoded);
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/**
+ * Async variant of buildBody that embeds a `hash` field in the DSP:META block.
+ *
+ * @param {object} meta    DSP:META JSON object (must not contain a `hash` field)
+ * @param {string} content Human-readable text (may be empty string)
+ * @returns {Promise<string>} Issue body string with hash embedded in meta
+ */
+export async function buildBodyWithHash(meta, content = '') {
+  const hash = await computeContentHash(meta, content);
+  return buildBody({ ...meta, hash }, content);
+}
+
+/**
+ * Verify the `hash` embedded in an issue body against its content.
+ *
+ * @param {string} issueBody Raw GitHub issue body string
+ * @returns {Promise<boolean|null>}
+ *   `true`  – hash present and matches
+ *   `false` – hash present but does not match (tampered)
+ *   `null`  – no hash field in meta (legacy record, cannot verify)
+ */
+export async function verifyBodyHash(issueBody) {
+  const meta = parseBody(issueBody);
+  if (!meta || meta.hash == null) return null;
+  const content  = extractContent(issueBody);
+  const computed = await computeContentHash(meta, content);
+  return computed === meta.hash;
+}
+
+/**
  * Extract and parse the DSP:META JSON block from an issue body.
  *
  * @param {string} issueBody GitHub issue body string

@@ -140,7 +140,7 @@ export class DisputeController {
     };
     const challenge = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Challenge to #${post.id} in dispute #${dispute.id}: ${text.slice(0, 60)}`,
-      body:   gh.buildBody(meta, text),
+      body:   await gh.buildBodyWithHash(meta, text),
       labels: ['dsp:challenge'],
     }, this._token);
     cache.invalidatePattern(gh.issueUrl(this._dataRepo, dispute.rootPostId));
@@ -214,7 +214,7 @@ export class DisputeController {
 
     const answer = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Answer to #${challenge.id} in dispute #${dispute.id}`,
-      body:   gh.buildBody(answerMeta, text ?? ''),
+      body:   await gh.buildBodyWithHash(answerMeta, text ?? ''),
       labels: ['dsp:answer'],
     }, this._token);
 
@@ -231,14 +231,14 @@ export class DisputeController {
       };
       ccIssue = await gh.post(gh.issuesUrl(this._dataRepo), {
         title:  `Counter-challenge in dispute #${dispute.id}`,
-        body:   gh.buildBody(ccMeta, counterChallenge.text),
+        body:   await gh.buildBodyWithHash(ccMeta, counterChallenge.text),
         labels: ['dsp:challenge'],
       }, this._token);
 
       // Backfill counterChallengeId into the Answer.
       const patchedMeta = { ...answerMeta, counterChallengeId: ccIssue.number };
       await gh.patch(gh.issueUrl(this._dataRepo, answer.number), {
-        body: gh.buildBody(patchedMeta, text ?? ''),
+        body: await gh.buildBodyWithHash(patchedMeta, text ?? ''),
       }, this._token);
     }
 
@@ -305,7 +305,7 @@ export class DisputeController {
     const content = imageUrl ? `![offer image](${imageUrl})` : text;
     const offer   = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Offer in dispute #${dispute.id}: ${text.slice(0, 60)}`,
-      body:   gh.buildBody(meta, content),
+      body:   await gh.buildBodyWithHash(meta, content),
       labels: ['dsp:assertion', 'dsp:offer'],
     }, this._token);
 
@@ -386,7 +386,7 @@ export class DisputeController {
     const body = `Crickets conditions proposed: ${_humanDuration(durationMs)} per challenge. Dispute #${dispute.id}.`;
     return gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Crickets proposal for dispute #${dispute.id}`,
-      body:   gh.buildBody(meta, body),
+      body:   await gh.buildBodyWithHash(meta, body),
       labels: ['dsp:crickets-conditions'],
     }, this._token);
   }
@@ -432,7 +432,7 @@ export class DisputeController {
 
     const event = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Crickets in dispute #${dispute.id}`,
-      body:   gh.buildBody(meta, body),
+      body:   await gh.buildBodyWithHash(meta, body),
       labels: ['dsp:crickets-event'],
     }, this._token);
 
@@ -481,7 +481,7 @@ export class DisputeController {
     const title = `Dispute of crickets ruling in #${originalDispute.id}`;
     return gh.post(gh.issuesUrl(this._dataRepo), {
       title,
-      body:   gh.buildBody(meta, title),
+      body:   await gh.buildBodyWithHash(meta, title),
       labels: ['dsp:dispute', 'dsp:active'],
     }, this._token);
   }

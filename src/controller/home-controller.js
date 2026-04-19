@@ -115,14 +115,14 @@ export class HomeController {
 
     const created = await gh.post(gh.issuesUrl(this._dataRepo), {
       title,
-      body:   gh.buildBody(meta, content),
+      body:   await gh.buildBodyWithHash(meta, content),
       labels: ['dsp:assertion'],
     }, this._token);
 
     // Patch rootId to self-reference once we have the issue number.
     const patchedMeta = { ...meta, rootId: created.number };
     await gh.patch(gh.issueUrl(this._dataRepo, created.number), {
-      body: gh.buildBody(patchedMeta, content),
+      body: await gh.buildBodyWithHash(patchedMeta, content),
     }, this._token);
 
     // Invalidate feed cache so next load picks up the new post.
@@ -203,7 +203,7 @@ export class HomeController {
 
     const challenge = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Challenge to #${post.id}: ${text.slice(0, 60)}`,
-      body:   gh.buildBody(challengeMeta, text),
+      body:   await gh.buildBodyWithHash(challengeMeta, text),
       labels: ['dsp:challenge'],
     }, this._token);
 
@@ -222,14 +222,14 @@ export class HomeController {
 
     const dispute = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  disputeTitle,
-      body:   gh.buildBody(disputeMeta, disputeTitle),
+      body:   await gh.buildBodyWithHash(disputeMeta, disputeTitle),
       labels: ['dsp:dispute', 'dsp:active'],
     }, this._token);
 
     // Backfill disputeId into the Challenge.
     const patchedChallengeMeta = { ...challengeMeta, disputeId: dispute.number };
     await gh.patch(gh.issueUrl(this._dataRepo, challenge.number), {
-      body: gh.buildBody(patchedChallengeMeta, text),
+      body: await gh.buildBodyWithHash(patchedChallengeMeta, text),
     }, this._token);
 
     cache.invalidatePattern(gh.issuesUrl(this._dataRepo));
@@ -290,7 +290,7 @@ export class HomeController {
     const body    = `I agree with #${assertion.id}.`;
     const created = await gh.post(gh.issuesUrl(this._dataRepo), {
       title:  `Agreement: @${person.login} agrees with #${assertion.id}`,
-      body:   gh.buildBody(meta, body),
+      body:   await gh.buildBodyWithHash(meta, body),
       labels: ['dsp:agreement'],
     }, this._token);
 
