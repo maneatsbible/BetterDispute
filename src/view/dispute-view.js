@@ -18,7 +18,6 @@ import { renderPostCard }      from './components/post-card.js';
 import { renderComposer }      from './components/composer.js';
 import { showNotification }    from './components/notification.js';
 import { setUrlParams }        from '../utils/url.js';
-import { ICON_BACK }           from '../utils/icons.js';
 import { playCricketsChirp }   from '../utils/audio.js';
 import { POST_TYPE_CHALLENGE } from '../model/post.js';
 
@@ -83,20 +82,24 @@ export class DisputeView {
     const container = document.createElement('div');
     container.className = 'dispute-view';
 
-    // Back button
-    const backBtn = document.createElement('button');
-    backBtn.className = 'dispute-view__back icon-btn';
-    backBtn.innerHTML = `${ICON_BACK} Back`;
-    backBtn.addEventListener('click', () => {
+    // Lineage header (clicking the root assertion navigates home)
+    const lineage = _buildLineage(dispute, postTree);
+    lineage.querySelector('.dispute-view__lineage-home')?.addEventListener('click', () => {
       setUrlParams({});
       this._root.dispatchEvent(new CustomEvent('dsp:navigate', {
         bubbles: true, detail: { view: 'home' },
       }));
     });
-    container.appendChild(backBtn);
-
-    // Lineage header
-    container.appendChild(_buildLineage(dispute, postTree));
+    lineage.querySelector('.dispute-view__lineage-home')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setUrlParams({});
+        this._root.dispatchEvent(new CustomEvent('dsp:navigate', {
+          bubbles: true, detail: { view: 'home' },
+        }));
+      }
+    });
+    container.appendChild(lineage);
 
     // Your-turn indicator
     const isYourTurn = this._user && dispute.defenderId === this._user.id && dispute.isActive;
@@ -370,7 +373,8 @@ function _buildLineage(dispute, postTree) {
     : `#${dispute.rootPostId}`;
 
   root.innerHTML = `
-    <span class="dispute-view__lineage-item" data-post-id="${dispute.rootPostId}">
+    <span class="dispute-view__lineage-item dispute-view__lineage-home"
+          role="button" tabindex="0" aria-label="Back to home feed">
       ${_esc(summary)}
     </span>
     <span class="dispute-view__lineage-sep"> → </span>

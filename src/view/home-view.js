@@ -42,9 +42,9 @@ export class HomeView {
     this._root.innerHTML = `
       <div class="home-view">
         <div class="home-toolbar">
-          <button class="btn btn--primary" id="home-compose-btn"
-                  ${this._user ? '' : 'disabled'}>
-            Start a fire 🔥
+          <button class="btn home-cta-btn" id="home-compose-btn"
+                  ${this._user ? '' : 'disabled'} title="Start a new dispute">
+            🔥 Start a fire
           </button>
         </div>
         <div class="home-feed" id="home-feed"></div>
