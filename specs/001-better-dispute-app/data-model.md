@@ -54,7 +54,7 @@ The base of all user-created content. Every Post is a GitHub Issue in the shared
 
 ### Assertion (extends Post)
 
-A top-level claim or a resolution Offer. The root of every Post tree.
+A top-level assertion or a resolution Offer. The root of every Post tree.
 
 | Field | Type | Notes |
 |-------|------|-------|

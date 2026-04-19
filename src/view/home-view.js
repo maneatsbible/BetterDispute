@@ -158,7 +158,7 @@ export class HomeView {
     const toolbar = this._root.querySelector('.home-toolbar');
     this._composer = renderComposer(toolbar, {
       mode:              'assertion',
-      placeholder:       'Make a claim…',
+      placeholder:       'Make an assertion…',
       canPostAsStrawman: this._ctrl.canPostAsStrawman(this._user).allowed,
       onSubmit:          data => this._submitAssertion(data),
       onCancel:          ()   => { this._composer?.destroy(); this._composer = null; },

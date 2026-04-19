@@ -3,7 +3,7 @@
  * disputable.io use cases:
  *
  *  A. Active dispute, interrogatory challenge, multi-round Q&A
- *  B. Active dispute, objection challenge on a factual claim
+ *  B. Active dispute, objection challenge on a factual assertion
  *  C. Resolved dispute — defender accepted an offer reassertion
  *  D. Crickets dispute — challenger declared no-response
  *  E. Counter-challenge scenario — defender challenges the challenge
@@ -48,7 +48,7 @@ const USERS = {
   'dave':         { login: 'dave',         id: 1004 },
   'eve':          { login: 'eve',          id: 1005 },
   'frank':        { login: 'frank',        id: 1006 },
-  'dsp-strawman': { login: 'dsp-strawman', id: 1 },
+  'strawman':     { login: 'strawman',     id: 1 },
 };
 
 function _userId(login) {
@@ -56,7 +56,7 @@ function _userId(login) {
 }
 
 // Exported convenience list of mock users so the dev toolbar can offer a picker.
-export const MOCK_USERS = Object.values(USERS).filter(u => u.login !== 'dsp-strawman');
+export const MOCK_USERS = Object.values(USERS).filter(u => u.login !== 'strawman');
 
 // ---------------------------------------------------------------------------
 // SCENARIO A — Active dispute, interrogatory challenge, multi-round Q&A
@@ -102,7 +102,7 @@ const A_ANSWER2 = issue(
 
 const A_DISPUTE = issue(
   301, ['dsp:dispute'],
-  USERS['dsp-strawman'], '2026-04-01T11:00:00Z',
+  USERS.alice, '2026-04-01T11:00:00Z',
   meta({
     type: 'dispute',
     challengerId: USERS.alice.id, challengerLogin: 'alice',
@@ -114,7 +114,7 @@ const A_DISPUTE = issue(
 );
 
 // ---------------------------------------------------------------------------
-// SCENARIO B — Active dispute, objection challenge on a factual claim
+// SCENARIO B — Active dispute, objection challenge on a factual assertion
 // Topic: "The Great Wall of China is visible from space"
 // Challenger: carol  |  Defender: dave
 // ---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ const B_CHALL = issue(
   103, ['dsp:challenge'],
   USERS.carol, '2026-04-02T09:30:00Z',
   meta({ type: 'challenge', challengeType: 'objection', rootId: 2, parentId: 2, disputeId: 302 }) +
-  '\n\nThis claim is factually wrong. Every NASA astronaut who has commented on the subject, including Ed Lu and Chris Hadfield, has explicitly stated the wall is too narrow to be seen without optical aids.',
+  '\n\nThis assertion is factually wrong. Every NASA astronaut who has commented on the subject, including Ed Lu and Chris Hadfield, has explicitly stated the wall is too narrow to be seen without optical aids.',
 );
 
 const B_ANSWER = issue(
@@ -142,7 +142,7 @@ const B_ANSWER = issue(
 
 const B_DISPUTE = issue(
   302, ['dsp:dispute'],
-  USERS['dsp-strawman'], '2026-04-02T09:30:00Z',
+  USERS.carol, '2026-04-02T09:30:00Z',
   meta({
     type: 'dispute',
     challengerId: USERS.carol.id, challengerLogin: 'carol',
@@ -175,7 +175,7 @@ const C_CHALL = issue(
 
 const C_OFFER_ASSERT = issue(
   4, ['dsp:assertion'],
-  USERS['dsp-strawman'], '2026-03-15T19:00:00Z',
+  USERS.strawman, '2026-03-15T19:00:00Z',
   meta({
     type: 'assertion', rootId: 3, parentId: 3,
     isOffer: true, offeredInDisputeId: 303,
@@ -193,7 +193,7 @@ const C_ANSWER = issue(
 
 const C_DISPUTE = issue(
   303, ['dsp:dispute'],
-  USERS['dsp-strawman'], '2026-03-15T18:20:00Z',
+  USERS.eve, '2026-03-15T18:20:00Z',
   meta({
     type: 'dispute',
     challengerId: USERS.eve.id,   challengerLogin: 'eve',
@@ -224,12 +224,12 @@ const D_CHALL = issue(
   105, ['dsp:challenge'],
   USERS.alice, '2026-03-20T09:00:00Z',
   meta({ type: 'challenge', challengeType: 'interrogatory', rootId: 5, parentId: 5, disputeId: 304 }) +
-  '\n\nStanford professor Nicholas Bloom\'s 2023 meta-analysis found no significant productivity difference for remote vs in-office — how do you reconcile that with your claim?',
+  '\n\nStanford professor Nicholas Bloom\'s 2023 meta-analysis found no significant productivity difference for remote vs in-office — how do you reconcile that with your assertion?',
 );
 
 const D_CRICKETS_COND = issue(
   501, ['dsp:crickets-conditions'],
-  USERS['dsp-strawman'], '2026-03-21T09:00:00Z',
+  USERS.alice, '2026-03-21T09:00:00Z',
   meta({
     type: 'crickets-conditions',
     disputeId: 304,
@@ -242,7 +242,7 @@ const D_CRICKETS_COND = issue(
 
 const D_CRICKETS_EVENT = issue(
   601, ['dsp:crickets-event'],
-  USERS['dsp-strawman'], '2026-03-22T09:05:00Z',
+  USERS.alice, '2026-03-22T09:05:00Z',
   meta({
     type: 'crickets-event',
     disputeId: 304,
@@ -254,7 +254,7 @@ const D_CRICKETS_EVENT = issue(
 
 const D_DISPUTE = issue(
   304, ['dsp:dispute', 'dsp:crickets-event'],
-  USERS['dsp-strawman'], '2026-03-20T09:00:00Z',
+  USERS.alice, '2026-03-20T09:00:00Z',
   meta({
     type: 'dispute',
     challengerId: USERS.alice.id, challengerLogin: 'alice',
@@ -269,6 +269,7 @@ const D_DISPUTE = issue(
 // SCENARIO E — Counter-challenge (defender challenges the challenge)
 // Topic: "Veganism is the only ethical diet"
 // Challenger: carol  |  Defender: bob
+// Flow: carol objects → bob answers + counter-challenges → carol answers counter
 // ---------------------------------------------------------------------------
 
 const E_ASSERT = issue(
@@ -285,16 +286,33 @@ const E_CHALL = issue(
   '\n\nThis ignores the environmental destruction caused by monoculture farming of staple vegan crops. Locally-raised, small-scale animal agriculture can have a lower net ecological footprint.',
 );
 
+// Bob answers carol's objection and includes a counter-challenge (issue 107).
+const E_ANSWER = issue(
+  205, ['dsp:answer'],
+  USERS.bob, '2026-04-05T14:00:00Z',
+  meta({ type: 'answer', rootId: 6, parentId: 106, disputeId: 305, counterChallengeId: 107 }) +
+  '\n\nSmall-scale animal agriculture is the exception, not the rule. Global vegan supply chains are still far less carbon-intensive per calorie than global meat supply chains when you account for land use.',
+);
+
+// The counter-challenge: bob challenges carol on her empirical assertion (parentId = answer 205).
 const E_COUNTER_CHALL = issue(
   107, ['dsp:challenge'],
-  USERS.bob, '2026-04-05T14:00:00Z',
-  meta({ type: 'challenge', challengeType: 'interrogatory', rootId: 6, parentId: 106, disputeId: 305 }) +
+  USERS.bob, '2026-04-05T14:05:00Z',
+  meta({ type: 'challenge', challengeType: 'interrogatory', rootId: 6, parentId: 205, disputeId: 305 }) +
   '\n\nCan you cite a peer-reviewed LCA study showing that any animal-product supply chain has a lower carbon equivalent per gram of protein than legumes at the same production scale?',
+);
+
+// Carol answers bob's counter-challenge, completing the two-lane round.
+const E_ANSWER2 = issue(
+  206, ['dsp:answer'],
+  USERS.carol, '2026-04-05T15:00:00Z',
+  meta({ type: 'answer', rootId: 6, parentId: 107, disputeId: 305 }) +
+  '\n\nPoore & Nemecek (2018, Science) show pasture-raised beef in certain low-productivity regions has comparable land-use efficiency to soy monocultures when accounting for marginal land. The global average hides significant variance.',
 );
 
 const E_DISPUTE = issue(
   305, ['dsp:dispute'],
-  USERS['dsp-strawman'], '2026-04-05T13:00:00Z',
+  USERS.carol, '2026-04-05T13:00:00Z',
   meta({
     type: 'dispute',
     challengerId: USERS.carol.id, challengerLogin: 'carol',
@@ -382,7 +400,7 @@ export const SEED_ISSUES = [
   // Scenario D
   D_ASSERT, D_CHALL, D_CRICKETS_COND, D_CRICKETS_EVENT, D_DISPUTE,
   // Scenario E
-  E_ASSERT, E_CHALL, E_COUNTER_CHALL, E_DISPUTE,
+  E_ASSERT, E_CHALL, E_ANSWER, E_COUNTER_CHALL, E_ANSWER2, E_DISPUTE,
   // Scenario F
   F_ASSERT, F_AGREE_ALICE, F_AGREE_CAROL,
   // Scenario G

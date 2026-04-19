@@ -461,7 +461,7 @@
 
 ## Phase 20: Strawman Composer Redesign — Callout, Required Challenge, and Author Notification
 
-**Goal**: The strawman composer is purpose-built for one job: publicly disputing a specific claim someone made, with the intent to surface the dispute back to its author. It is redesigned from a generic assertion composer with a URL attachment into a three-step guided flow: **source the claim → state the challenge → notify the author**.
+**Goal**: The strawman composer is purpose-built for one job: publicly disputing a specific assertion someone made, with the intent to surface the dispute back to its author. It is redesigned from a generic assertion composer with a URL attachment into a three-step guided flow: **source the assertion → state the challenge → notify the author**.
 
 **Key design decisions**:
 - A strawman post **always opens with a required, simultaneous challenge** — the two are one atomic submission. An unchallenged strawman post cannot be created.
@@ -473,7 +473,7 @@
 ### Step 1 — Source Detection & Auto-Widget
 
 - [ ] T183 Extend `src/api/citation-client.js` — add `detectAndFetch(url)`: inspects the hostname and URL shape to determine source type (`"social"` for twitter.com, x.com, bsky.app, facebook.com, instagram.com, threads.net; `"video"` for youtube.com, youtu.be, vimeo.com; `"article"` for everything else); calls `fetchQuote()`, `fetchVideoMeta()`, or `fetchCitation()` accordingly; returns `{ widgetType, payload }` in `src/api/citation-client.js`
-- [ ] T184 Redesign the strawman variant of `renderComposer()` in `composer.js` — replace the flat `defaultWidget` option with a full `mode: "strawman"` composer mode that renders a three-step flow: **(1) Paste URL** → auto-detection spinner → resolved widget preview with detected author name and claim text; **(2) State your challenge** — assertion text field pre-filled with editable suggestion (social: quote text truncated to 150 chars; article: OG title); required inline challenge composer below (Interrogatory or Objection selector + challenge text; cannot submit without it); **(3) Review & Submit** — shows the final assertion card + challenge card side-by-side before committing; in `src/view/components/composer.js`
+- [ ] T184 Redesign the strawman variant of `renderComposer()` in `composer.js` — replace the flat `defaultWidget` option with a full `mode: "strawman"` composer mode that renders a three-step flow: **(1) Paste URL** → auto-detection spinner → resolved widget preview with detected author name and assertion text; **(2) State your challenge** — assertion text field pre-filled with editable suggestion (social: quote text truncated to 150 chars; article: OG title); required inline challenge composer below (Interrogatory or Objection selector + challenge text; cannot submit without it); **(3) Review & Submit** — shows the final assertion card + challenge card side-by-side before committing; in `src/view/components/composer.js`
 - [ ] T185 Update `submitAssertion()` in `home-controller.js` — add `strawmanChallenge` parameter; when present, atomically write the Assertion Issue then immediately write the Challenge Issue and Dispute Issue in sequence; if any write fails after the Assertion is created, surface a recovery notification with a link to finish the challenge manually; in `src/controller/home-controller.js`
 
 ### Step 2 — Assertion Text Auto-Suggestion
@@ -482,13 +482,13 @@
 
 ### Step 3 — Notify the Author
 
-- [ ] T187 [P] Implement `src/view/components/notify-panel.js` — `renderNotifyPanel({ widgetType, payload, disputeUrl })`: shown as a slide-up panel immediately after a strawman post submits successfully; displays: detected author handle (or domain for articles), a pre-composed notification message (e.g. `"@handle — your claim was disputed: {disputeUrl}"`), a **Copy** button (copies message to clipboard via `navigator.clipboard`), and platform-specific **Open on X / Open on Bluesky** intent buttons that open `https://x.com/intent/post?text=...` or `https://bsky.app/intent/compose?text=...` in a new tab; a "Done" button dismisses; in `src/view/components/notify-panel.js`
+- [ ] T187 [P] Implement `src/view/components/notify-panel.js` — `renderNotifyPanel({ widgetType, payload, disputeUrl })`: shown as a slide-up panel immediately after a strawman post submits successfully; displays: detected author handle (or domain for articles), a pre-composed notification message (e.g. `"@handle — your assertion was disputed: {disputeUrl}"`), a **Copy** button (copies message to clipboard via `navigator.clipboard`), and platform-specific **Open on X / Open on Bluesky** intent buttons that open `https://x.com/intent/post?text=...` or `https://bsky.app/intent/compose?text=...` in a new tab; a "Done" button dismisses; in `src/view/components/notify-panel.js`
 - [ ] T188 Wire `renderNotifyPanel()` into the strawman post-submit flow in `home-view.js`: after `submitAssertion()` resolves, render the notify panel over the current view (not navigating away); in `src/view/home-view.js`
 - [ ] T189 [P] Build intent URL helpers in `src/utils/url.js`: `buildXIntentUrl(text)` → `https://x.com/intent/post?text={encoded}`; `buildBlueSkyIntentUrl(text)` → `https://bsky.app/intent/compose?text={encoded}`; max 280 chars enforced (truncate dispute URL suffix last); in `src/utils/url.js`
 
 ### OG Preview Enhancement for Strawman Posts
 
-- [ ] T190 Update `worker/index.js` (T078) — when the requested Issue is a strawman Assertion with a `"quote"` or `"web-citation"` widget: set `og:title` to `"[authorHandle] disputed on disputable.io"`; set `og:description` to the original claim text (quote text or article title, truncated to 200 chars); set `og:image` to the original author's profile pic URL if available; this makes the shared dispute URL show the original person's own words as the social card preview in `worker/index.js`
+- [ ] T190 Update `worker/index.js` (T078) — when the requested Issue is a strawman Assertion with a `"quote"` or `"web-citation"` widget: set `og:title` to `"[authorHandle] disputed on disputable.io"`; set `og:description` to the original assertion text (quote text or article title, truncated to 200 chars); set `og:image` to the original author's profile pic URL if available; this makes the shared dispute URL show the original person's own words as the social card preview in `worker/index.js`
 
 ### CSS & Tests
 
@@ -520,7 +520,7 @@
 
 **Branding rules** (encode in all relevant files):
 - Wordmark: `disputable.io` — all lowercase, never "Disputable.io" or "Disputable"
-- Tagline: `every claim is disputable.` (lowercase, period intentional)
+- Tagline: `disputes in, disputes out` (lowercase, no period)
 - Secondary taglines: `say it. defend it.` / `post it. prove it.`
 - Accent colour anchor: fire orange (`#e85d04` or nearest existing `--color-*` token)
 - Favicon: flame glyph (🔥) as interim; SVG flame to replace in a follow-up
@@ -529,7 +529,7 @@
 
 - [ ] T199 Rename `CONFIG.appName` value to `'disputable.io'` in `src/config.sample.js` and `src/config.js`; add `appName` field if not already present in `src/config.sample.js`
 - [ ] T200 [P] Replace all legacy product-name string literals in `src/` with `"disputable.io"`; replace the old product shorthand in inline comments and JSDoc where it refers to the product name (leave `dsp:` label identifiers untouched — those are data-layer keys, not branding) across `src/`
-- [ ] T201 [P] Update `<title>` in `index.html` to `disputable.io — every claim is disputable.`; update any `<meta name="description">` and `<meta property="og:site_name">` tags to `disputable.io` in `index.html`
+- [ ] T201 [P] Update `<title>` in `index.html` to `disputable.io — disputes in, disputes out`; update any `<meta name="description">` and `<meta property="og:site_name">` tags to `disputable.io` in `index.html`
 - [ ] T202 [P] Update `renderHeader()` in `src/view/components/header.js`: replace the legacy title text with `disputable.io`; keep scales icon and version on far-right unchanged in `src/view/components/header.js`
 
 ### Repo & Config Naming Conventions
@@ -540,7 +540,7 @@
 ### UI & Empty States
 
 - [ ] T205 [P] Update all user-facing strings in `src/view/` — empty state messages, notification text, page headings — to use `disputable.io` branding and lowercase tone; update "Start a fire 🔥" composer placeholder to remain as-is (it's on-brand); update any legacy-name references in notification copy in `src/view/`
-- [ ] T206 [P] Update the post-submit author callout template in `src/view/components/notify-panel.js` (T187) to read: `"your claim is disputable: {disputeUrl}"` — dropping the app name from the message body (the URL domain carries the brand) in `src/view/components/notify-panel.js`
+- [ ] T206 [P] Update the post-submit author callout template in `src/view/components/notify-panel.js` (T187) to read: `"your assertion is disputable: {disputeUrl}"` — dropping the app name from the message body (the URL domain carries the brand) in `src/view/components/notify-panel.js`
 
 ### Docs & Specs
 

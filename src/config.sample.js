@@ -12,7 +12,7 @@ export const CONFIG = {
   dataRepo: 'YOUR_ORG/dsp-data',
 
   /** GitHub login of the @strawman account */
-  strawmanLogin: 'dsp-strawman',
+  strawmanLogin: 'strawman',
 
   /** App version shown in the header */
   appVersion: '0.1.0',

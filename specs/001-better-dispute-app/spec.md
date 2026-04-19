@@ -143,7 +143,7 @@ disputable.io is built on the conviction that **the best disputes are won with e
 
 This philosophy is expressed in the product in two ways:
 
-1. **Post types** (Assertion, Challenge, Answer) are designed around substantive claims, questions, and responses — not logical scaffolding.
+1. **Post types** (Assertion, Challenge, Answer) are designed around substantive assertions, questions, and responses — not logical scaffolding.
 2. **Logic & Reasoning widgets** (Fallacy Tag, Claim Map) are available *only as post-hoc diagnostic tools* — they describe errors and patterns in reasoning that has already occurred, never as a method to construct or win an argument. They are restricted to Challenge and Answer posts (not Assertions) and to Moment annotations.
 
 > A Fallacy Tag names a failure that happened. A Claim Map renders visible what was implicit. Neither is an argument.

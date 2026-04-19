@@ -39,7 +39,7 @@
  *  B. Active, objection on a factual claim     (dispute #302, carol vs dave)
  *  C. Resolved via accepted offer              (dispute #303, eve vs frank)
  *  D. Crickets — no response from defender     (dispute #304, alice vs dave)
- *  E. Counter-challenge scenario               (dispute #305, carol vs bob)
+ *  E. Counter-challenge full loop               (dispute #305, carol vs bob — objection → answer+counter → answer)
  *  F. Agreement (no dispute)                   (assertion #7, frank)
  *  G. Fresh standalone assertions (feed variety)
  */
